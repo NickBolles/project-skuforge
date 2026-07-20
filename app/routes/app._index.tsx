@@ -24,6 +24,8 @@ export default function Index() {
         <p>Catalog variants: {data.variantCount}</p>
         <p><a href="/app/rules">Manage SKU rules</a></p>
         <p><a href="/app/generate">Generate missing SKUs</a></p>
+        <p><a href="/app/editor">Bulk editor</a></p>
+        <p><a href="/app/csv">CSV export/import</a></p>
       </section>
     );
   }
@@ -36,6 +38,8 @@ export default function Index() {
         <s-paragraph>Catalog variants: {data.variantCount}</s-paragraph>
         <s-link href="/app/rules">Manage SKU rules</s-link>
         <s-link href="/app/generate">Generate missing SKUs</s-link>
+        <s-link href="/app/editor">Bulk editor</s-link>
+        <s-link href="/app/csv">CSV export/import</s-link>
       </s-section>
     </s-page>
   );

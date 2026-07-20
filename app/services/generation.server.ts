@@ -1,14 +1,15 @@
 import { Prisma, type GenerationJob, type PrismaClient } from "@prisma/client";
 import type { CatalogVariant, ShopifyCatalog } from "../adapters/shopify/catalog";
 import { formatInternalBarcode, type InternalBarcodeSettings } from "../core/barcode";
+import { validateCsvImport, type CsvVariantRow } from "../core/csv";
 import { parsePattern, render, type PatternAst } from "../core/sku";
-import { assignUnique, canWriteBarcode, DupIndex } from "../core/validate";
+import { assignUnique, canWriteBarcode, DupIndex, normalizeSku } from "../core/validate";
 import { acquireJobLock, heartbeatJobLock, JobLockedError, releaseJobLock } from "./job-lock.server";
 import { ensureShop, getRule, parseRuleConfig } from "./rules.server";
 import { allocateSequenceBlock } from "./sequence.server";
 import { verifyGenerationRun } from "./verification.server";
 
-export type GenerationTrigger = "all_missing" | "selected" | "webhook" | "fix";
+export type GenerationTrigger = "all_missing" | "selected" | "webhook" | "fix" | "csv";
 
 export interface GenerationTotals {
   planned: number;
@@ -94,7 +95,7 @@ export class SimulatedGenerationCrash extends Error {
 
 const bulkTails = new Map<string, Promise<void>>();
 
-async function withBulkMutex<T>(shopId: string, task: () => Promise<T>): Promise<T> {
+export async function withCatalogBulkMutex<T>(shopId: string, task: () => Promise<T>): Promise<T> {
   const previous = bulkTails.get(shopId) ?? Promise.resolve();
   let release!: () => void;
   const tail = new Promise<void>((resolve) => { release = resolve; });
@@ -144,7 +145,7 @@ async function createJobRecord(
 }
 
 async function catalogSnapshot(catalog: ShopifyCatalog, shopId: string): Promise<CatalogVariant[]> {
-  return withBulkMutex(shopId, async () => {
+  return withCatalogBulkMutex(shopId, async () => {
     const variants: CatalogVariant[] = [];
     for await (const batch of catalog.streamAllVariants({ batchSize: 250 })) variants.push(...batch);
     return variants;
@@ -333,6 +334,51 @@ async function refreshBarcodeAssignments(db: PrismaClient, catalog: ShopifyCatal
   }
 }
 
+async function refreshCsvAssignments(db: PrismaClient, catalog: ShopifyCatalog, job: GenerationJob): Promise<void> {
+  const all = await catalogSnapshot(catalog, job.shopId);
+  const current = new Map(all.map((variant) => [variant.variantId, variant]));
+  const items = await db.generationJobItem.findMany({
+    where: { jobId: job.id, status: "planned" },
+    orderBy: { id: "asc" },
+  });
+  const active: typeof items = [];
+  for (const item of items) {
+    const variant = current.get(item.variantId);
+    if (!variant) {
+      await db.generationJobItem.update({ where: { id: item.id }, data: { status: "error", message: "Variant was not found during CSV apply revalidation." } });
+      continue;
+    }
+    const skuStale = item.proposedSku !== null && variant.sku !== item.expectedSku;
+    const barcodeStale = item.proposedBarcode !== null && variant.barcode !== item.expectedBarcode;
+    if (skuStale || barcodeStale) {
+      await db.generationJobItem.update({ where: { id: item.id }, data: { status: "skipped_conflict", message: "The variant changed after the CSV dry-run. Reload and review the import again." } });
+      continue;
+    }
+    active.push(item);
+  }
+  const rows: CsvVariantRow[] = active.map((item) => {
+    const variant = current.get(item.variantId)!;
+    return {
+      variant_id: item.variantId,
+      product_title: variant.productTitle,
+      variant_title: variant.variantTitle,
+      vendor: variant.vendor,
+      sku: item.proposedSku ?? variant.sku ?? "",
+      barcode: item.proposedBarcode ?? variant.barcode ?? "",
+    };
+  });
+  const report = validateCsvImport(rows, all, {
+    includeBarcodeOverwrites: (JSON.parse(job.fields) as string[]).includes("barcode_overwrite"),
+  });
+  for (const blocked of report.rows.filter((row) => row.verdict === "block")) {
+    const details = blocked.issues.filter((entry) => entry.severity === "block").map((entry) => entry.message).join(" ");
+    await db.generationJobItem.update({
+      where: { jobId_variantId: { jobId: job.id, variantId: blocked.row.variant_id } },
+      data: { status: "error", message: `CSV apply was stopped by write-time revalidation. ${details}` },
+    });
+  }
+}
+
 async function pointAssignment(
   catalog: ShopifyCatalog,
   base: string,
@@ -373,14 +419,18 @@ async function runWrites(
   options: RunGenerationOptions,
 ): Promise<void> {
   const batchSize = Math.min(Math.max(options.batchSize ?? 100, 1), 250);
-  const items = await db.generationJobItem.findMany({ where: { jobId: job.id, status: { not: "applied" } }, orderBy: { id: "asc" } });
+  const pendingItems = await db.generationJobItem.findMany({ where: { jobId: job.id, status: "planned" }, orderBy: { id: "asc" } });
+  const batches = job.trigger === "csv"
+    ? batchCsvWritesSwapSafe(pendingItems, batchSize)
+    : Array.from({ length: Math.ceil(pendingItems.length / batchSize) }, (_, index) => pendingItems.slice(index * batchSize, (index + 1) * batchSize));
   let completedBatches = 0;
-  for (let offset = 0; offset < items.length; offset += batchSize) {
+  let processed = 0;
+  for (const candidateBatch of batches) {
     const freshJob = await db.generationJob.findUniqueOrThrow({ where: { id: job.id } });
     if (freshJob.status === "cancelled") return;
     const barcodeJob = generatesBarcode(job);
-    const batch = items.slice(offset, offset + batchSize).filter((item) =>
-      item.status !== "error" && (barcodeJob ? item.proposedBarcode : item.proposedSku),
+    const batch = candidateBatch.filter((item) =>
+      job.trigger === "csv" ? item.proposedSku !== null || item.proposedBarcode !== null : (barcodeJob ? item.proposedBarcode : item.proposedSku),
     );
     if (job.trigger === "webhook" || job.trigger === "fix") {
       const reservations = new DupIndex();
@@ -391,18 +441,89 @@ async function runWrites(
         await db.generationJobItem.update({ where: { id: item.id }, data: { proposedSku: checked } });
       }
     }
-    const results = await catalog.updateVariants(batch.map((item) => barcodeJob
-      ? { variantId: item.variantId, barcode: item.proposedBarcode!, expectedBarcode: item.expectedBarcode }
-      : { variantId: item.variantId, sku: item.proposedSku!, expectedSku: item.expectedSku }));
+    const results = await catalog.updateVariants(batch.map((item) => {
+      if (job.trigger === "csv") {
+        return {
+          variantId: item.variantId,
+          ...(item.proposedSku === null ? {} : { sku: item.proposedSku, expectedSku: item.expectedSku }),
+          ...(item.proposedBarcode === null ? {} : {
+            barcode: item.proposedBarcode,
+            expectedBarcode: item.expectedBarcode,
+            allowBarcodeOverwrite: (JSON.parse(job.fields) as string[]).includes("barcode_overwrite"),
+          }),
+        };
+      }
+      return barcodeJob
+        ? { variantId: item.variantId, barcode: item.proposedBarcode!, expectedBarcode: item.expectedBarcode }
+        : { variantId: item.variantId, sku: item.proposedSku!, expectedSku: item.expectedSku };
+    }));
     await db.$transaction(results.map((result) => db.generationJobItem.update({
       where: { jobId_variantId: { jobId: job.id, variantId: result.variantId } },
       data: { status: result.status, message: result.message ?? null },
     })));
-    await db.generationJob.update({ where: { id: job.id }, data: { cursor: String(offset + batch.length) } });
+    processed += batch.length;
+    await db.generationJob.update({ where: { id: job.id }, data: { cursor: String(processed) } });
     await heartbeatJobLock(db, job.shopId, job.id);
     completedBatches += 1;
     if (options.crashAfterBatches === completedBatches) throw new SimulatedGenerationCrash();
   }
+}
+
+function batchCsvWritesSwapSafe<T extends {
+  variantId: string;
+  expectedSku: string | null;
+  proposedSku: string | null;
+  expectedBarcode: string | null;
+  proposedBarcode: string | null;
+}>(items: T[], batchSize: number): T[][] {
+  const byId = new Map(items.map((item) => [item.variantId, item]));
+  const adjacent = new Map<string, Set<string>>();
+  for (const field of ["Sku", "Barcode"] as const) {
+    const expectedKey = `expected${field}` as "expectedSku" | "expectedBarcode";
+    const proposedKey = `proposed${field}` as "proposedSku" | "proposedBarcode";
+    const byExpected = new Map(items.flatMap((item) => item[expectedKey] ? [[normalizeSku(item[expectedKey]!), item] as const] : []));
+    for (const item of items) {
+      const owner = item[proposedKey] ? byExpected.get(normalizeSku(item[proposedKey]!)) : undefined;
+      if (!owner || owner.variantId === item.variantId) continue;
+      const left = adjacent.get(item.variantId) ?? new Set<string>();
+      const right = adjacent.get(owner.variantId) ?? new Set<string>();
+      left.add(owner.variantId);
+      right.add(item.variantId);
+      adjacent.set(item.variantId, left);
+      adjacent.set(owner.variantId, right);
+    }
+  }
+  const seen = new Set<string>();
+  const components: T[][] = [];
+  const visit = (id: string, component: T[]) => {
+    if (seen.has(id)) return;
+    seen.add(id);
+    const item = byId.get(id);
+    if (item) component.push(item);
+    for (const next of adjacent.get(id) ?? []) visit(next, component);
+  };
+  for (const item of items) {
+    if (seen.has(item.variantId)) continue;
+    const component: T[] = [];
+    visit(item.variantId, component);
+    if (component.length > 250) throw new Error("A CSV swap cycle exceeds Shopify's safe 250-variant write batch limit.");
+    components.push(component);
+  }
+  const batches: T[][] = [];
+  let current: T[] = [];
+  for (const component of components) {
+    if (current.length && current.length + component.length > batchSize) {
+      batches.push(current);
+      current = [];
+    }
+    current.push(...component);
+    if (current.length >= batchSize) {
+      batches.push(current);
+      current = [];
+    }
+  }
+  if (current.length) batches.push(current);
+  return batches;
 }
 
 async function calculateTotals(db: PrismaClient, jobId: string, verification?: { scanId: string; summary: { duplicateGroups: number; duplicateBarcodeGroups: number } }): Promise<GenerationTotals> {
@@ -429,7 +550,7 @@ export async function runGenerationJob(
   let job = await db.generationJob.findUniqueOrThrow({ where: { id: jobId } });
   if (["completed", "completed_with_skips", "completed_with_findings"].includes(job.status)) return { job, queued: false };
   try {
-    await acquireJobLock(db, { shopId: job.shopId, jobId: job.id, kind: "generation", staleAfterMs: options.staleAfterMs });
+    await acquireJobLock(db, { shopId: job.shopId, jobId: job.id, kind: job.trigger === "csv" ? "csv" : "generation", staleAfterMs: options.staleAfterMs });
   } catch (error) {
     if (error instanceof JobLockedError && (options.source === "webhook" || job.trigger === "webhook")) {
       await db.generationJob.update({ where: { id: job.id }, data: { status: "pending", error: null } });
@@ -442,13 +563,14 @@ export async function runGenerationJob(
   let verificationScanId: string | undefined;
   try {
     job = await db.generationJob.update({ where: { id: job.id }, data: { status: "running", error: null, finishedAt: null } });
-    if (generatesBarcode(job)) await refreshBarcodeAssignments(db, catalog, job);
+    if (job.trigger === "csv") await refreshCsvAssignments(db, catalog, job);
+    else if (generatesBarcode(job)) await refreshBarcodeAssignments(db, catalog, job);
     else if (job.trigger === "webhook" || job.trigger === "fix") await planSingleAssignments(db, catalog, job);
     else await refreshBulkAssignments(db, catalog, job);
     await runWrites(db, catalog, job, options);
     const cancelled = await db.generationJob.findUniqueOrThrow({ where: { id: job.id } });
     if (cancelled.status === "cancelled") return { job: cancelled, queued: false };
-    const verification = await withBulkMutex(job.shopId, () => verifyGenerationRun({ db, catalog, shopId: job.shopId }));
+    const verification = await withCatalogBulkMutex(job.shopId, () => verifyGenerationRun({ db, catalog, shopId: job.shopId }));
     verificationScanId = verification.scanId;
     const totals = await calculateTotals(db, job.id, verification);
     const status = verification.summary.duplicateGroups + verification.summary.duplicateBarcodeGroups > 0

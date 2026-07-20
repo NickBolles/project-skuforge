@@ -1,6 +1,9 @@
 node_modules
 /.tmp-template/
 /.tooling/
+/.pnpm-store/
+/tmp/
+/debug.log
 
 # macOS
 .DS_Store
