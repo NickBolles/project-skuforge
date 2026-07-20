@@ -6,7 +6,7 @@
 > (`products/create` webhook registered, preview/apply scope parity, rule-aware malformed detection). The core uniqueness wedge audited clean.
 >
 > **Next steps:**
-> - **Deploy & live-test** → [`DEPLOYMENT_HANDOFF.md`](./DEPLOYMENT_HANDOFF.md) — VPS + Traefik + Shopify dev-store runbook. **Note:** this repo still needs a `docker-compose.yml` (web + Postgres) — see handoff §3a.
+> - **Deploy & live-test** → [`DEPLOYMENT_HANDOFF.md`](./DEPLOYMENT_HANDOFF.md) — VPS + Traefik + Shopify dev-store runbook. Production deployment is supplied by `docker-compose.yml` and PostgreSQL migrations under `prisma/postgres/migrations/`.
 > - **Remaining backlog** → [`GAP_REPORT.md`](./GAP_REPORT.md) §B: label-station UX (variant search/paging + template picker — gates the $19 Premium hook); GS1 UPC/EAN integration; single-instance/ops docs.
 > - **Human gate:** `docs/GO_LIVE.md` requires a week-0 competitor audit before public listing.
 

@@ -11,8 +11,8 @@ RUN npm ci && npm cache clean --force
 
 COPY . .
 
-# Generate the Prisma client (uses the CLI from devDependencies) before bundling.
-RUN npm run prisma -- generate
+# Generate the production PostgreSQL Prisma client before bundling.
+RUN npm run generate:postgres
 
 RUN npm run build
 
