@@ -23,7 +23,8 @@
     "check:schema": "node scripts/check-schema-sync.mjs",
     "check": "node scripts/check-schema-sync.mjs && tsc --noEmit && eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint . && vitest run --configLoader runner && react-router build",
     "gen:fixture": "tsx scripts/gen-fixture.mjs",
-    "smoke:mock": "node scripts/smoke-mock.mjs"
+    "smoke:mock": "node scripts/smoke-mock.mjs",
+    "cron:local": "node scripts/run-cron-local.mjs"
   },
   "type": "module",
   "engines": {

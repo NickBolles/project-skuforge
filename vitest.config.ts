@@ -7,7 +7,7 @@ export default defineConfig({
     environment: "node",
     env: {
       AUTH_MODE: "mock",
-      MOCK_PLAN: "free",
+      MOCK_PLAN: "premium",
     },
     include: ["test/**/*.test.ts", "app/**/*.test.ts"],
     restoreMocks: true,

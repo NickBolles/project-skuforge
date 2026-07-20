@@ -1,53 +1,26 @@
 # SKUForge — SKU & Barcode Manager for Shopify
 
-> **Generate, validate, and print every SKU and barcode in your store — without spreadsheets.**
+SKUForge generates collision-safe SKUs and internal Code 128 barcodes, scans existing catalogs for duplicate or malformed values, prints vector PDF labels, and validates CSV changes before Shopify writes.
 
-**Status:** planning · **Priority:** #2 build (after AlertProof) · **Target:** $12–19/mo
+The app is a React Router 7 Shopify app with Prisma storage. Core domain logic is isolated under `app/core`; Shopify catalog and billing integrations sit behind ports with offline fakes and recorded fixtures.
 
-## Why this exists
+## Local development
 
-Verified research (July 2026):
+1. Copy `.env.example` to `.env` and keep `AUTH_MODE=mock`.
+2. Install dependencies and apply the SQLite migrations.
+3. Run `npm run dev:mock`.
+4. Use `MOCK_PLAN=free`, `pro`, or `premium` to exercise billing gates without credentials.
 
-- SKU & barcode management was the **#1 growth category** in Shopify App Store merchant searches (+182% page views, Shopify-attributed 2024 data).
-- A merchant in the Shopify Community found **exactly one app that auto-fills both SKU and barcode fields — and it had no duplicate checking** ("fatal issue," their words). Recommended workarounds were spreadsheet formulas and custom scripts.
-- The wedge: rule-based generation with a **hard uniqueness guarantee**, duplicate scanning/fixing, and label printing.
+Mock auth is explicit and rejected in production. No live Shopify credentials are stored in this repository.
 
-## Key docs
+## Validation
 
-- [`PLAN.md`](./PLAN.md) — full MVP spec: features, architecture, pricing, distribution, risks.
+Run `npm run check` for schema drift, typecheck, lint, tests, and the production build. See [docs/TESTING.md](./docs/TESTING.md) for focused suites and the manual walkthrough.
 
-## Kickoff Prompt
+## Operations and architecture
 
-Paste this into Claude Code from the repo root to start:
-
-```
-Read PLAN.md carefully. You are helping me build SKUForge, a Shopify embedded app,
-as a solo developer targeting a 4-5 week MVP.
-
-Phase 0 — the mandatory market audit (PLAN.md flags this; do it before any code):
-1. Search the Shopify App Store for current "SKU generator", "barcode generator", and
-   "SKU manager" apps. For the top 5-8: pricing, ratings, and specifically whether any
-   now does (a) auto-fill of BOTH SKU and barcode fields, (b) duplicate validation,
-   (c) label printing. The 2022-era gap may have closed. Give me a verdict:
-   build as planned / build with changed wedge / deprioritize. Wait for my go.
-
-Phase 1 — plan (on go):
-2. Check current Shopify docs: GraphQL bulk operations API (limits, async patterns for
-   10k-variant catalogs), metafield/variant update mutations, and the current app scaffold.
-3. Produce docs/ARCHITECTURE.md: data model (rule patterns, token grammar for
-   {prefix}-{vendor}-{size}-{seq}, scan results), the duplicate-scan design (nightly cron +
-   on-generation checks), and the label-PDF pipeline (Avery + thermal Dymo/Zebra sizes).
-4. Produce a week-by-week GitHub issue breakdown with acceptance criteria.
-
-Phase 2 — scaffold:
-5. Scaffold the app + dev store, then build the catalog scan + duplicate report first
-   (it's the demo that sells the install), and show me before continuing.
-
-Constraints: respect API rate limits (assume 10k+ variant stores), all bulk writes
-resumable/idempotent, live preview before any mutation touches real data. Be honest in
-UX about internal barcodes vs GS1 UPC/EAN — never imply we generate official UPCs.
-```
-
-## Portfolio context
-
-Second build in the 4-product plan (`alertproof` → `skuforge` → `checkoutwatch` → `ticketpilot`). Shares the Remix/billing scaffolding and Polaris patterns with AlertProof — copy, don't reinvent.
+- [Implementation plan](./IMPLEMENTATION_PLAN.md)
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Nightly cron](./docs/CRON.md)
+- [Go-live credential handoff](./docs/GO_LIVE.md)
+- [Product and market plan](./PLAN.md)

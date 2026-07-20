@@ -3,6 +3,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { code128Svg, formatInternalBarcode, INTERNAL_BARCODE_HONESTY_COPY } from "../core/barcode";
 import { getAppContext } from "../services/context.server";
+import { entitlementResponse, enforceVariantLimit } from "../services/entitlements.server";
 import { createBulkBarcodeGenerationJob, createBulkGenerationJob, parseBarcodeSettings, saveBarcodeSettings } from "../services/generation.server";
 import { ensureShop, listRules } from "../services/rules.server";
 import { peekSequence } from "../services/sequence.server";
@@ -22,7 +23,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session, db, catalog } = await getAppContext(request);
+  const { session, db, catalog, billing } = await getAppContext(request);
   const form = await request.formData();
   if (form.get("intent") === "save-barcode-settings") {
     await saveBarcodeSettings(db, session.shop, {
@@ -31,6 +32,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       startNumber: Number(form.get("startNumber")),
     });
     return redirect("/app/generate");
+  }
+  try {
+    await enforceVariantLimit(billing, catalog, session.shop);
+  } catch (error) {
+    const response = entitlementResponse(error);
+    if (response) return response;
+    throw error;
   }
   const trigger = form.get("trigger") === "selected" ? "selected" : "all_missing";
   const common = {

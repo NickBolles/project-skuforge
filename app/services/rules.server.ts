@@ -74,7 +74,8 @@ export async function ensureShop(db: RulesDb, shopDomain: string) {
   return db.shop.upsert({
     where: { shopDomain },
     create: { shopDomain },
-    update: {},
+    // A successfully authenticated request after reinstall reactivates the shop.
+    update: { uninstalledAt: null },
   });
 }
 

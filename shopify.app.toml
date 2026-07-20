@@ -18,6 +18,10 @@ api_version = "2025-10"
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
 
+  [[webhooks.subscriptions]]
+  topics = [ "app_subscriptions/update" ]
+  uri = "/webhooks/app-subscriptions-update"
+
   # Webhooks can have filters
   # Only receive webhooks for product updates with a product price >= 10.00
   # See: https://shopify.dev/docs/apps/build/webhooks/customize/filters
@@ -26,16 +30,15 @@ api_version = "2025-10"
   # uri = "/webhooks/products/update"
   # filter = "variants.price:>=10.00"
 
-  # Mandatory compliance topic for public apps only
-  # See: https://shopify.dev/docs/apps/build/privacy-law-compliance
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/data_request"
-  # compliance_topics = ["customers/data_request"]
+  # Mandatory privacy-law compliance topics for public apps.
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/customers-data-request"
+  compliance_topics = ["customers/data_request"]
 
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/redact"
-  # compliance_topics = ["customers/redact"]
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/customers-redact"
+  compliance_topics = ["customers/redact"]
 
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/shop/redact"
-  # compliance_topics = ["shop/redact"]
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/shop-redact"
+  compliance_topics = ["shop/redact"]

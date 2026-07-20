@@ -3,6 +3,7 @@ import { useActionData, useLoaderData } from "react-router";
 import { getAppContext } from "../services/context.server";
 import { cancelGenerationJob, getGenerationJob, runGenerationJob } from "../services/generation.server";
 import { JobLockedError } from "../services/job-lock.server";
+import { entitlementResponse, enforceVariantLimit } from "../services/entitlements.server";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { session, db } = await getAppContext(request);
@@ -10,7 +11,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
-  const { session, db, catalog } = await getAppContext(request);
+  const { session, db, catalog, billing } = await getAppContext(request);
   const form = await request.formData();
   const job = await getGenerationJob(db, session.shop, params.jobId!);
   if (form.get("intent") === "cancel") {
@@ -18,9 +19,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     return { ok: true, cancelled: true };
   }
   try {
+    await enforceVariantLimit(billing, catalog, session.shop);
     const result = await runGenerationJob(db, catalog, job.id, { source: "ui" });
     return { ok: true, status: result.job.status };
   } catch (error) {
+    const gated = entitlementResponse(error);
+    if (gated) return gated;
     if (error instanceof JobLockedError) {
       return Response.json({ ok: false, error: error.message, runningJobId: error.lock.jobId }, { status: 409 });
     }

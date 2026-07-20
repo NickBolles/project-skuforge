@@ -1,0 +1,6 @@
+{
+  "shop_id": 12345,
+  "shop_domain": "privacy.myshopify.test",
+  "orders_requested": [1001],
+  "customer": { "id": 9001, "email": "redacted@example.test", "phone": null }
+}

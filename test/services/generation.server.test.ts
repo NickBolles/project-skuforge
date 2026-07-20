@@ -97,8 +97,8 @@ describe("generation jobs", () => {
     await rule("{vendor:3}-{seq:4}", true);
     const shop = await ensureShop(db, shopDomain);
     await db.shop.update({ where: { id: shop.id }, data: { settings: JSON.stringify({ autoGenerateOnCreate: true }) } });
-    const first = await handleProductsCreate({ db, catalog, shopDomain, webhookId: "event-1", payload: { variantIds: ["v1"] } });
-    const replay = await handleProductsCreate({ db, catalog, shopDomain, webhookId: "event-1", payload: { variantIds: ["v1"] } });
+    const first = await handleProductsCreate({ db, catalog, shopDomain, webhookId: "event-1", payload: { variantIds: ["v1"] }, plan: "premium" });
+    const replay = await handleProductsCreate({ db, catalog, shopDomain, webhookId: "event-1", payload: { variantIds: ["v1"] }, plan: "premium" });
     expect(first.jobId).toBeTruthy();
     expect(replay).toMatchObject({ deduped: true, jobId: null });
     expect(await db.webhookEvent.count({ where: { shopId: shop.id } })).toBe(1);

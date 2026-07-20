@@ -1,13 +1,21 @@
 import type { ActionFunctionArgs } from "react-router";
 import { createLabelsPdf } from "../services/labels.server";
 import { getAppContext } from "../services/context.server";
+import { entitlementResponse, enforceEntitlement } from "../services/entitlements.server";
 
 function checked(form: FormData, name: string): boolean {
   return form.get(name) === "on";
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { catalog } = await getAppContext(request);
+  const { catalog, billing, session } = await getAppContext(request);
+  try {
+    await enforceEntitlement(billing, session.shop, "label_printing");
+  } catch (error) {
+    const response = entitlementResponse(error);
+    if (response) return response;
+    throw error;
+  }
   const form = await request.formData();
   const bytes = await createLabelsPdf(catalog, {
     templateId: String(form.get("templateId") ?? "avery-5160"),

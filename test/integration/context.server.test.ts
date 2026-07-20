@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FakeBillingGateway } from "../../app/adapters/billing/gateway";
+import { FakeBillingGateway } from "../../app/adapters/billing/fakeBilling";
 import { FixtureCatalog } from "../../app/adapters/shopify/fixture-catalog.server";
 import { getAppContext } from "../../app/services/context.server";
 

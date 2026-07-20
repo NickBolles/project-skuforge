@@ -275,11 +275,13 @@ export async function enqueueSingleVariantJob(
   const record = await createJobRecord(db, { shopId: shop.id, ruleSetId: rule.id, trigger: input.trigger, idempotencyKey: input.idempotencyKey, fields: ["sku"] });
   if (record.created) {
     const variants = await catalog.getVariants(input.variantIds);
-    const missing = variants.filter((variant) => variant.sku === null || variant.sku.trim() === "");
-    if (missing.length) {
-      await db.generationJobItem.createMany({ data: missing.map((variant) => ({ jobId: record.job.id, variantId: variant.variantId, productId: variant.productId, expectedSku: variant.sku })) });
+    const targets = input.trigger === "fix"
+      ? variants
+      : variants.filter((variant) => variant.sku === null || variant.sku.trim() === "");
+    if (targets.length) {
+      await db.generationJobItem.createMany({ data: targets.map((variant) => ({ jobId: record.job.id, variantId: variant.variantId, productId: variant.productId, expectedSku: variant.sku })) });
     }
-    await db.generationJob.update({ where: { id: record.job.id }, data: { totals: JSON.stringify({ planned: missing.length, applied: 0, skippedConflict: 0, errored: 0 }) } });
+    await db.generationJob.update({ where: { id: record.job.id }, data: { totals: JSON.stringify({ planned: targets.length, applied: 0, skippedConflict: 0, errored: 0 }) } });
   }
   return db.generationJob.findUniqueOrThrow({ where: { id: record.job.id }, include: { items: true } });
 }

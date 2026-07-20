@@ -2,6 +2,8 @@ import { Prisma, type PrismaClient } from "@prisma/client";
 import type { ShopifyCatalog } from "../adapters/shopify/catalog";
 import { enqueueSingleVariantJob, runGenerationJob } from "./generation.server";
 import { ensureShop } from "./rules.server";
+import { can, EntitlementError } from "./entitlements.server";
+import type { BillingPlan } from "../core/constants";
 
 interface ProductWebhookPayload {
   id?: string | number;
@@ -26,7 +28,11 @@ export async function handleProductsCreate(options: {
   webhookId: string;
   payload: ProductWebhookPayload;
   forceAutomation?: boolean;
+  plan: BillingPlan;
 }) {
+  if (!can(options.plan, "auto_generation")) {
+    throw new EntitlementError("auto_generation", "Automatic generation for new products requires the pro plan. Upgrade to continue.", "pro");
+  }
   const shop = await ensureShop(options.db, options.shopDomain);
   try {
     await options.db.webhookEvent.create({

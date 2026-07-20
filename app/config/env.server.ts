@@ -5,6 +5,11 @@ const nonBlankOptional = z.preprocess(
   z.string().trim().min(1).optional(),
 );
 
+const booleanEnv = z.preprocess(
+  (value) => typeof value === "string" ? ["1", "true", "yes", "on"].includes(value.toLowerCase()) : value,
+  z.boolean().default(false),
+);
+
 const baseEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   AUTH_MODE: z.enum(["shopify", "mock"]).default("shopify"),
@@ -15,6 +20,7 @@ const baseEnvSchema = z.object({
   DATABASE_URL: nonBlankOptional,
   CRON_SECRET: nonBlankOptional,
   MOCK_PLAN: z.enum(["free", "pro", "premium"]).default("free"),
+  BILLING_TEST: booleanEnv,
   SHOP_CUSTOM_DOMAIN: nonBlankOptional,
 });
 

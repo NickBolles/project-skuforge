@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto";
-import type { ActionFunctionArgs } from "react-router";
-import { useActionData } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { useActionData, useLoaderData } from "react-router";
 import type { CsvImportReport } from "../core/csv";
 import { applyCsvImport, dryRunCsvImport } from "../services/csv.server";
 import { getAppContext } from "../services/context.server";
+import { PlanGate } from "../components/PlanGate";
+import { can, entitlementResponse, enforceEntitlement } from "../services/entitlements.server";
 
 type CsvActionData =
   | { intent: "dry-run"; report: CsvImportReport; source: string; includeBarcodeOverwrites: boolean }
@@ -22,9 +24,10 @@ async function csvSource(form: FormData): Promise<string> {
   return upload.text();
 }
 
-export const action = async ({ request }: ActionFunctionArgs): Promise<CsvActionData> => {
+export const action = async ({ request }: ActionFunctionArgs): Promise<CsvActionData | Response> => {
   try {
-    const { session, catalog, db } = await getAppContext(request);
+    const { session, catalog, db, billing } = await getAppContext(request);
+    await enforceEntitlement(billing, session.shop, "csv_workflows");
     const form = await request.formData();
     const source = await csvSource(form);
     const includeBarcodeOverwrites = checked(form, "includeBarcodeOverwrites");
@@ -42,8 +45,16 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<CsvAction
       includeBarcodeOverwrites,
     };
   } catch (error) {
+    const response = entitlementResponse(error);
+    if (response) return response;
     return { intent: "error", message: error instanceof Error ? error.message : "CSV processing failed." };
   }
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { session, billing } = await getAppContext(request);
+  const plan = await billing.getPlan(session.shop);
+  return { plan, allowed: can(plan, "csv_workflows") };
 };
 
 function DryRunReport({ data }: { data: Extract<CsvActionData, { intent: "dry-run" }> }) {
@@ -69,8 +80,10 @@ function DryRunReport({ data }: { data: Extract<CsvActionData, { intent: "dry-ru
 
 export default function CsvRoute() {
   const data = useActionData<typeof action>();
+  const { allowed } = useLoaderData<typeof loader>();
   return (
     <s-page heading="CSV export and import">
+      <PlanGate allowed={allowed} requiredPlan="premium">
       <s-section heading="Export">
         <p>Exports variant IDs, context, SKUs, and barcodes using the bulk editor’s filter parameters.</p>
         <a href="/api/csv/export">Download all variants CSV</a>
@@ -87,6 +100,7 @@ export default function CsvRoute() {
       {data?.intent === "dry-run" ? <DryRunReport data={data} /> : null}
       {data?.intent === "apply" ? <s-section heading="Import applied"><p>Job {data.jobId}: {data.status}. Mandatory post-run duplicate verification completed.</p></s-section> : null}
       {data?.intent === "error" ? <p role="alert">{data.message}</p> : null}
+      </PlanGate>
     </s-page>
   );
 }
