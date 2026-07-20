@@ -1,7 +1,8 @@
 import { Prisma, type GenerationJob, type PrismaClient } from "@prisma/client";
 import type { CatalogVariant, ShopifyCatalog } from "../adapters/shopify/catalog";
+import { formatInternalBarcode, type InternalBarcodeSettings } from "../core/barcode";
 import { parsePattern, render, type PatternAst } from "../core/sku";
-import { assignUnique, DupIndex } from "../core/validate";
+import { assignUnique, canWriteBarcode, DupIndex } from "../core/validate";
 import { acquireJobLock, heartbeatJobLock, JobLockedError, releaseJobLock } from "./job-lock.server";
 import { ensureShop, getRule, parseRuleConfig } from "./rules.server";
 import { allocateSequenceBlock } from "./sequence.server";
@@ -15,6 +16,7 @@ export interface GenerationTotals {
   skippedConflict: number;
   errored: number;
   duplicateGroups?: number;
+  duplicateBarcodeGroups?: number;
   verificationScanId?: string;
 }
 
@@ -24,6 +26,49 @@ export interface CreateGenerationInput {
   trigger: "all_missing" | "selected";
   idempotencyKey: string;
   selectedVariantIds?: string[];
+}
+
+export interface BarcodeSettings extends InternalBarcodeSettings {
+  startNumber: number;
+}
+
+export type CreateBarcodeGenerationInput = Omit<CreateGenerationInput, "ruleSetId"> & {
+  ruleSetId?: string;
+};
+
+const DEFAULT_BARCODE_SETTINGS: BarcodeSettings = {
+  prefix: "",
+  digits: 12,
+  startNumber: 1,
+};
+
+export function parseBarcodeSettings(settings: string | Record<string, unknown> | BarcodeSettings): BarcodeSettings {
+  const parsed: Record<string, unknown> = typeof settings === "string"
+    ? JSON.parse(settings || "{}") as Record<string, unknown>
+    : { ...settings };
+  const barcode = typeof parsed.barcode === "object" && parsed.barcode !== null
+    ? parsed.barcode as Record<string, unknown>
+    : parsed;
+  const resolved = {
+    prefix: typeof barcode.prefix === "string" ? barcode.prefix : DEFAULT_BARCODE_SETTINGS.prefix,
+    digits: typeof barcode.digits === "number" ? barcode.digits : DEFAULT_BARCODE_SETTINGS.digits,
+    startNumber: typeof barcode.startNumber === "number" ? barcode.startNumber : DEFAULT_BARCODE_SETTINGS.startNumber,
+  };
+  // Reuse the formatter as the single validation point for prefix/digit width.
+  formatInternalBarcode(resolved.startNumber, resolved);
+  return resolved;
+}
+
+export async function saveBarcodeSettings(
+  db: PrismaClient,
+  shopDomain: string,
+  settings: BarcodeSettings,
+): Promise<BarcodeSettings> {
+  const validated = parseBarcodeSettings(settings);
+  const shop = await ensureShop(db, shopDomain);
+  const current = JSON.parse(shop.settings || "{}") as Record<string, unknown>;
+  await db.shop.update({ where: { id: shop.id }, data: { settings: JSON.stringify({ ...current, barcode: validated }) } });
+  return validated;
 }
 
 export interface RunGenerationOptions {
@@ -83,11 +128,11 @@ function hasSequence(ast: PatternAst): boolean {
 
 async function createJobRecord(
   db: PrismaClient,
-  data: { shopId: string; ruleSetId: string; trigger: GenerationTrigger; idempotencyKey: string },
+  data: { shopId: string; ruleSetId: string; trigger: GenerationTrigger; idempotencyKey: string; fields: ("sku" | "barcode")[] },
 ): Promise<{ job: GenerationJob; created: boolean }> {
   try {
     const job = await db.generationJob.create({
-      data: { ...data, fields: JSON.stringify(["sku"]), totals: JSON.stringify({ planned: 0, applied: 0, skippedConflict: 0, errored: 0 }) },
+      data: { ...data, fields: JSON.stringify(data.fields), totals: JSON.stringify({ planned: 0, applied: 0, skippedConflict: 0, errored: 0 }) },
     });
     return { job, created: true };
   } catch (error) {
@@ -124,6 +169,7 @@ export async function createBulkGenerationJob(
     ruleSetId: rule.id,
     trigger: input.trigger,
     idempotencyKey: input.idempotencyKey,
+    fields: ["sku"],
   });
   if (!record.created) return db.generationJob.findUniqueOrThrow({ where: { id: record.job.id }, include: { items: true } });
 
@@ -161,6 +207,63 @@ export async function createBulkGenerationJob(
   }
 }
 
+export async function createBulkBarcodeGenerationJob(
+  db: PrismaClient,
+  catalog: ShopifyCatalog,
+  input: CreateBarcodeGenerationInput,
+) {
+  if (!input.idempotencyKey.trim()) throw new Error("An idempotency key is required.");
+  const shop = await ensureShop(db, input.shopDomain);
+  const record = await createJobRecord(db, {
+    shopId: shop.id,
+    ruleSetId: input.ruleSetId ?? "internal-code128",
+    trigger: input.trigger,
+    idempotencyKey: input.idempotencyKey,
+    fields: ["barcode"],
+  });
+  if (!record.created) return db.generationJob.findUniqueOrThrow({ where: { id: record.job.id }, include: { items: true } });
+
+  try {
+    const all = await catalogSnapshot(catalog, shop.id);
+    const selected = new Set(input.selectedVariantIds ?? []);
+    const targets = all.filter((variant) => {
+      const inScope = input.trigger === "all_missing" || selected.has(variant.variantId);
+      return inScope && canWriteBarcode(variant.barcode, "pending-generated-value");
+    });
+    const index = new DupIndex();
+    index.addBatch(all.map((variant) => ({ variantId: variant.variantId, sku: variant.barcode })));
+    const settings = parseBarcodeSettings(shop.settings);
+    const block = targets.length
+      ? await allocateSequenceBlock(db, shop.id, "barcode", targets.length, settings.startNumber)
+      : null;
+    const items = [];
+    let sequence = block?.start ?? settings.startNumber;
+    for (const variant of targets) {
+      let proposed = formatInternalBarcode(sequence, settings);
+      while (index.has(proposed, variant.variantId)) {
+        const extra = await allocateSequenceBlock(db, shop.id, "barcode", 1, settings.startNumber);
+        proposed = formatInternalBarcode(extra.start, settings);
+      }
+      index.reserve(proposed, variant.variantId);
+      items.push({
+        jobId: record.job.id,
+        variantId: variant.variantId,
+        productId: variant.productId,
+        proposedBarcode: proposed,
+        expectedBarcode: variant.barcode,
+      });
+      sequence += 1;
+    }
+    if (items.length) await db.generationJobItem.createMany({ data: items });
+    const totals: GenerationTotals = { planned: items.length, applied: 0, skippedConflict: 0, errored: 0 };
+    await db.generationJob.update({ where: { id: record.job.id }, data: { status: "previewing", totals: JSON.stringify(totals) } });
+    return db.generationJob.findUniqueOrThrow({ where: { id: record.job.id }, include: { items: true } });
+  } catch (error) {
+    await db.generationJob.update({ where: { id: record.job.id }, data: { status: "failed", error: error instanceof Error ? error.message : "Barcode planning failed.", finishedAt: new Date() } });
+    throw error;
+  }
+}
+
 export async function enqueueSingleVariantJob(
   db: PrismaClient,
   catalog: ShopifyCatalog,
@@ -168,7 +271,7 @@ export async function enqueueSingleVariantJob(
 ) {
   const shop = await ensureShop(db, input.shopDomain);
   const rule = await getRule(db, input.shopDomain, input.ruleSetId);
-  const record = await createJobRecord(db, { shopId: shop.id, ruleSetId: rule.id, trigger: input.trigger, idempotencyKey: input.idempotencyKey });
+  const record = await createJobRecord(db, { shopId: shop.id, ruleSetId: rule.id, trigger: input.trigger, idempotencyKey: input.idempotencyKey, fields: ["sku"] });
   if (record.created) {
     const variants = await catalog.getVariants(input.variantIds);
     const missing = variants.filter((variant) => variant.sku === null || variant.sku.trim() === "");
@@ -195,6 +298,37 @@ async function refreshBulkAssignments(db: PrismaClient, catalog: ShopifyCatalog,
     const assignment = assignUnique(item.proposedSku, index, { ownerId: item.variantId });
     if (assignment.sku !== item.proposedSku) {
       await db.generationJobItem.update({ where: { id: item.id }, data: { proposedSku: assignment.sku } });
+    }
+  }
+}
+
+function generatesBarcode(job: GenerationJob): boolean {
+  const fields = JSON.parse(job.fields) as string[];
+  return fields.includes("barcode");
+}
+
+async function refreshBarcodeAssignments(db: PrismaClient, catalog: ShopifyCatalog, job: GenerationJob): Promise<void> {
+  const all = await catalogSnapshot(catalog, job.shopId);
+  const current = new Map(all.map((variant) => [variant.variantId, variant]));
+  const index = new DupIndex();
+  index.addBatch(all.map((variant) => ({ variantId: variant.variantId, sku: variant.barcode })));
+  const shop = await db.shop.findUniqueOrThrow({ where: { id: job.shopId } });
+  const settings = parseBarcodeSettings(shop.settings);
+  const items = await db.generationJobItem.findMany({ where: { jobId: job.id, status: { not: "applied" } }, orderBy: { id: "asc" } });
+  for (const item of items) {
+    const variant = current.get(item.variantId);
+    if (!variant || !item.proposedBarcode) {
+      await db.generationJobItem.update({ where: { id: item.id }, data: { status: "error", message: "Variant or barcode proposal is unavailable." } });
+      continue;
+    }
+    let proposed = item.proposedBarcode;
+    while (index.has(proposed, item.variantId)) {
+      const extra = await allocateSequenceBlock(db, job.shopId, "barcode", 1, settings.startNumber);
+      proposed = formatInternalBarcode(extra.start, settings);
+    }
+    index.reserve(proposed, item.variantId);
+    if (proposed !== item.proposedBarcode) {
+      await db.generationJobItem.update({ where: { id: item.id }, data: { proposedBarcode: proposed } });
     }
   }
 }
@@ -244,7 +378,10 @@ async function runWrites(
   for (let offset = 0; offset < items.length; offset += batchSize) {
     const freshJob = await db.generationJob.findUniqueOrThrow({ where: { id: job.id } });
     if (freshJob.status === "cancelled") return;
-    const batch = items.slice(offset, offset + batchSize).filter((item) => item.status !== "error" && item.proposedSku);
+    const barcodeJob = generatesBarcode(job);
+    const batch = items.slice(offset, offset + batchSize).filter((item) =>
+      item.status !== "error" && (barcodeJob ? item.proposedBarcode : item.proposedSku),
+    );
     if (job.trigger === "webhook" || job.trigger === "fix") {
       const reservations = new DupIndex();
       for (const item of batch) {
@@ -254,7 +391,9 @@ async function runWrites(
         await db.generationJobItem.update({ where: { id: item.id }, data: { proposedSku: checked } });
       }
     }
-    const results = await catalog.updateVariants(batch.map((item) => ({ variantId: item.variantId, sku: item.proposedSku!, expectedSku: item.expectedSku })));
+    const results = await catalog.updateVariants(batch.map((item) => barcodeJob
+      ? { variantId: item.variantId, barcode: item.proposedBarcode!, expectedBarcode: item.expectedBarcode }
+      : { variantId: item.variantId, sku: item.proposedSku!, expectedSku: item.expectedSku }));
     await db.$transaction(results.map((result) => db.generationJobItem.update({
       where: { jobId_variantId: { jobId: job.id, variantId: result.variantId } },
       data: { status: result.status, message: result.message ?? null },
@@ -266,14 +405,18 @@ async function runWrites(
   }
 }
 
-async function calculateTotals(db: PrismaClient, jobId: string, verification?: { scanId: string; summary: { duplicateGroups: number } }): Promise<GenerationTotals> {
+async function calculateTotals(db: PrismaClient, jobId: string, verification?: { scanId: string; summary: { duplicateGroups: number; duplicateBarcodeGroups: number } }): Promise<GenerationTotals> {
   const items = await db.generationJobItem.findMany({ where: { jobId }, select: { status: true } });
   return {
     planned: items.length,
     applied: items.filter((item) => item.status === "applied").length,
     skippedConflict: items.filter((item) => item.status === "skipped_conflict").length,
     errored: items.filter((item) => item.status === "error").length,
-    ...(verification ? { duplicateGroups: verification.summary.duplicateGroups, verificationScanId: verification.scanId } : {}),
+    ...(verification ? {
+      duplicateGroups: verification.summary.duplicateGroups,
+      duplicateBarcodeGroups: verification.summary.duplicateBarcodeGroups,
+      verificationScanId: verification.scanId,
+    } : {}),
   };
 }
 
@@ -299,7 +442,8 @@ export async function runGenerationJob(
   let verificationScanId: string | undefined;
   try {
     job = await db.generationJob.update({ where: { id: job.id }, data: { status: "running", error: null, finishedAt: null } });
-    if (job.trigger === "webhook" || job.trigger === "fix") await planSingleAssignments(db, catalog, job);
+    if (generatesBarcode(job)) await refreshBarcodeAssignments(db, catalog, job);
+    else if (job.trigger === "webhook" || job.trigger === "fix") await planSingleAssignments(db, catalog, job);
     else await refreshBulkAssignments(db, catalog, job);
     await runWrites(db, catalog, job, options);
     const cancelled = await db.generationJob.findUniqueOrThrow({ where: { id: job.id } });
@@ -307,7 +451,7 @@ export async function runGenerationJob(
     const verification = await withBulkMutex(job.shopId, () => verifyGenerationRun({ db, catalog, shopId: job.shopId }));
     verificationScanId = verification.scanId;
     const totals = await calculateTotals(db, job.id, verification);
-    const status = verification.summary.duplicateGroups > 0
+    const status = verification.summary.duplicateGroups + verification.summary.duplicateBarcodeGroups > 0
       ? "completed_with_findings"
       : totals.skippedConflict > 0 || totals.errored > 0
         ? "completed_with_skips"

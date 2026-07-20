@@ -32,11 +32,12 @@ export default function GenerationJobRoute() {
   const job = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as { error?: string } | undefined;
   const totals = JSON.parse(job.totals) as Record<string, number | string>;
+  const barcodeJob = (JSON.parse(job.fields) as string[]).includes("barcode");
   return (
     <s-page heading={`Generation job ${job.id}`}>
       <s-section heading="Status"><p>{job.status}</p><p>Planned: {String(totals.planned ?? job.items.length)} · Applied: {String(totals.applied ?? 0)} · Skipped: {String(totals.skippedConflict ?? 0)}</p>{actionData?.error ? <p role="alert">{actionData.error}</p> : null}</s-section>
       {job.status === "previewing" ? <form method="post"><button type="submit" name="intent" value="run">Confirm and apply</button><button type="submit" name="intent" value="cancel">Cancel</button></form> : null}
-      <s-section heading="Preview (first 50)"><p>Large stores may take around 15 minutes. Progress is resumable.</p><table><thead><tr><th>Variant</th><th>Expected</th><th>Proposed</th><th>Status</th></tr></thead><tbody>{job.items.slice(0, 50).map((item) => <tr key={item.id}><td>{item.variantId}</td><td>{item.expectedSku ?? "—"}</td><td>{item.proposedSku ?? "—"}</td><td>{item.status}</td></tr>)}</tbody></table></s-section>
+      <s-section heading="Preview (first 50)"><p>Large stores may take around 15 minutes. Progress is resumable.</p><table><thead><tr><th>Variant</th><th>Expected</th><th>Proposed</th><th>Status</th></tr></thead><tbody>{job.items.slice(0, 50).map((item) => <tr key={item.id}><td>{item.variantId}</td><td>{(barcodeJob ? item.expectedBarcode : item.expectedSku) ?? "—"}</td><td>{(barcodeJob ? item.proposedBarcode : item.proposedSku) ?? "—"}</td><td>{item.status}</td></tr>)}</tbody></table></s-section>
     </s-page>
   );
 }

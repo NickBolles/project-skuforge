@@ -20,13 +20,17 @@ export async function allocateSequenceBlock(
   shopId: string,
   key: string,
   requestedSize: number,
+  initialValue = 1,
 ): Promise<SequenceBlock> {
   if (!Number.isSafeInteger(requestedSize) || requestedSize < 1) {
     throw new RangeError("Sequence block size must be a positive safe integer.");
   }
+  if (!Number.isSafeInteger(initialValue) || initialValue < 0) {
+    throw new RangeError("Initial sequence value must be a non-negative safe integer.");
+  }
   const counter = await db.sequenceCounter.upsert({
     where: { shopId_key: { shopId, key } },
-    create: { shopId, key, nextValue: 1 + requestedSize },
+    create: { shopId, key, nextValue: initialValue + requestedSize },
     update: { nextValue: { increment: requestedSize } },
   });
   const start = counter.nextValue - requestedSize;

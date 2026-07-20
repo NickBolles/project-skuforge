@@ -105,6 +105,7 @@ model GenerationJobItem {
   proposedSku     String?
   proposedBarcode String?
   expectedSku     String?
+  expectedBarcode String?
   status          String        @default("planned")
   message         String?
 
