@@ -1,0 +1,2522 @@
+[
+  {
+    "productId": "gid://shopify/Product/1000001",
+    "variantId": "gid://shopify/ProductVariant/2000001",
+    "productTitle": "Orbit Shirt 1",
+    "variantTitle": "Natural / XS",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XS"
+    },
+    "sku": null,
+    "barcode": "7000000000001",
+    "price": "134.47",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:01.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000001",
+    "variantId": "gid://shopify/ProductVariant/2000002",
+    "productTitle": "Redwood Hat 1",
+    "variantTitle": "Green / XL",
+    "vendor": "Redwood",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": null,
+    "barcode": "7000000000002",
+    "price": "136.27",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:02.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000001",
+    "variantId": "gid://shopify/ProductVariant/2000003",
+    "productTitle": "Juniper Mug 1",
+    "variantTitle": "Natural / XS",
+    "vendor": "Juniper",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XS"
+    },
+    "sku": null,
+    "barcode": "7000000000003",
+    "price": "102.77",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:03.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000002",
+    "variantId": "gid://shopify/ProductVariant/2000004",
+    "productTitle": "Redwood Shirt 2",
+    "variantTitle": "Natural / S",
+    "vendor": "Redwood",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "S"
+    },
+    "sku": null,
+    "barcode": "7000000000004",
+    "price": "177.39",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:04.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000002",
+    "variantId": "gid://shopify/ProductVariant/2000005",
+    "productTitle": "Acme Shoes 2",
+    "variantTitle": "Green / XS",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XS"
+    },
+    "sku": null,
+    "barcode": "7000000000005",
+    "price": "61.64",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:05.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000002",
+    "variantId": "gid://shopify/ProductVariant/2000006",
+    "productTitle": "Northstar Mug 2",
+    "variantTitle": "Red / XS",
+    "vendor": "Northstar",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": null,
+    "barcode": "7000000000006",
+    "price": "37.95",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:06.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000003",
+    "variantId": "gid://shopify/ProductVariant/2000007",
+    "productTitle": "Juniper Hat 3",
+    "variantTitle": "Red / XL",
+    "vendor": "Juniper",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XL"
+    },
+    "sku": null,
+    "barcode": "7000000000007",
+    "price": "171.69",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:07.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000003",
+    "variantId": "gid://shopify/ProductVariant/2000008",
+    "productTitle": "Northstar Shoes 3",
+    "variantTitle": "Natural / XL",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": null,
+    "barcode": "7000000000008",
+    "price": "149.41",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:08.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000003",
+    "variantId": "gid://shopify/ProductVariant/2000009",
+    "productTitle": "Orbit Hat 3",
+    "variantTitle": "Red / M",
+    "vendor": "Orbit",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": null,
+    "barcode": "7000000000009",
+    "price": "43.96",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:09.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000004",
+    "variantId": "gid://shopify/ProductVariant/2000010",
+    "productTitle": "Orbit Bag 4",
+    "variantTitle": "Blue / XL",
+    "vendor": "Orbit",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XL"
+    },
+    "sku": null,
+    "barcode": "7000000000010",
+    "price": "134.09",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:10.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000004",
+    "variantId": "gid://shopify/ProductVariant/2000011",
+    "productTitle": "Northstar Bag 4",
+    "variantTitle": "Green / S",
+    "vendor": "Northstar",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": null,
+    "barcode": "7000000000011",
+    "price": "128.97",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:11.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000004",
+    "variantId": "gid://shopify/ProductVariant/2000012",
+    "productTitle": "Juniper Hat 4",
+    "variantTitle": "Red / S",
+    "vendor": "Juniper",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": null,
+    "barcode": "7000000000012",
+    "price": "63.43",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:12.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000005",
+    "variantId": "gid://shopify/ProductVariant/2000013",
+    "productTitle": "Redwood Hat 5",
+    "variantTitle": "Black / XS",
+    "vendor": "Redwood",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "malformed sku 13",
+    "barcode": "7000000000013",
+    "price": "116.86",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:13.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000005",
+    "variantId": "gid://shopify/ProductVariant/2000014",
+    "productTitle": "Acme Shoes 5",
+    "variantTitle": "Natural / XL",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "malformed sku 14",
+    "barcode": "7000000000014",
+    "price": "153.94",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:14.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000005",
+    "variantId": "gid://shopify/ProductVariant/2000015",
+    "productTitle": "Acme Shirt 5",
+    "variantTitle": "Green / S",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": "malformed sku 15",
+    "barcode": "7000000000015",
+    "price": "66.46",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:15.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000006",
+    "variantId": "gid://shopify/ProductVariant/2000016",
+    "productTitle": "Acme Shoes 6",
+    "variantTitle": "Blue / M",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "M"
+    },
+    "sku": "malformed sku 16",
+    "barcode": "7000000000016",
+    "price": "190.99",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:16.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000006",
+    "variantId": "gid://shopify/ProductVariant/2000017",
+    "productTitle": "Acme Hat 6",
+    "variantTitle": "Natural / L",
+    "vendor": "Acme",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "L"
+    },
+    "sku": "malformed sku 17",
+    "barcode": "7000000000017",
+    "price": "187.57",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:17.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000006",
+    "variantId": "gid://shopify/ProductVariant/2000018",
+    "productTitle": "Acme Shoes 6",
+    "variantTitle": "Blue / XL",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XL"
+    },
+    "sku": "malformed sku 18",
+    "barcode": "7000000000018",
+    "price": "125.43",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:18.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000007",
+    "variantId": "gid://shopify/ProductVariant/2000019",
+    "productTitle": "Northstar Shoes 7",
+    "variantTitle": "Blue / M",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "M"
+    },
+    "sku": "SEEDED-DUPLICATE-001",
+    "barcode": "7000000000019",
+    "price": "123.51",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:19.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000007",
+    "variantId": "gid://shopify/ProductVariant/2000020",
+    "productTitle": "Acme Shirt 7",
+    "variantTitle": "Red / S",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SEEDED-DUPLICATE-001",
+    "barcode": "7000000000020",
+    "price": "64.30",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:20.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000007",
+    "variantId": "gid://shopify/ProductVariant/2000021",
+    "productTitle": "Redwood Bag 7",
+    "variantTitle": "Red / M",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SEEDED-DUPLICATE-001",
+    "barcode": "7000000000021",
+    "price": "92.94",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:21.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000008",
+    "variantId": "gid://shopify/ProductVariant/2000022",
+    "productTitle": "Redwood Bag 8",
+    "variantTitle": "Black / L",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "L"
+    },
+    "sku": "SEEDED-DUPLICATE-001",
+    "barcode": "7000000000022",
+    "price": "78.17",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:22.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000008",
+    "variantId": "gid://shopify/ProductVariant/2000023",
+    "productTitle": "Acme Shirt 8",
+    "variantTitle": "Red / XL",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XL"
+    },
+    "sku": "SKU-ACM-000023",
+    "barcode": "7000000000023",
+    "price": "118.64",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:23.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000008",
+    "variantId": "gid://shopify/ProductVariant/2000024",
+    "productTitle": "Redwood Bag 8",
+    "variantTitle": "Natural / L",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000024",
+    "barcode": "7000000000024",
+    "price": "80.19",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:24.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000009",
+    "variantId": "gid://shopify/ProductVariant/2000025",
+    "productTitle": "Orbit Shirt 9",
+    "variantTitle": "Green / XS",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XS"
+    },
+    "sku": "SKU-ORB-000025",
+    "barcode": "7000000000025",
+    "price": "39.73",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:25.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000009",
+    "variantId": "gid://shopify/ProductVariant/2000026",
+    "productTitle": "Redwood Bag 9",
+    "variantTitle": "Black / L",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000026",
+    "barcode": "7000000000026",
+    "price": "58.89",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:26.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000009",
+    "variantId": "gid://shopify/ProductVariant/2000027",
+    "productTitle": "Redwood Bag 9",
+    "variantTitle": "Blue / XL",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000027",
+    "barcode": "7000000000027",
+    "price": "64.24",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:27.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000010",
+    "variantId": "gid://shopify/ProductVariant/2000028",
+    "productTitle": "Northstar Shoes 10",
+    "variantTitle": "Natural / L",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "L"
+    },
+    "sku": "SKU-NOR-000028",
+    "barcode": "7000000000028",
+    "price": "20.64",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:28.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000010",
+    "variantId": "gid://shopify/ProductVariant/2000029",
+    "productTitle": "Juniper Shirt 10",
+    "variantTitle": "Natural / XL",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000029",
+    "barcode": "7000000000029",
+    "price": "179.41",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:29.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000010",
+    "variantId": "gid://shopify/ProductVariant/2000030",
+    "productTitle": "Orbit Shirt 10",
+    "variantTitle": "Green / L",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "L"
+    },
+    "sku": "SKU-ORB-000030",
+    "barcode": "7000000000030",
+    "price": "198.35",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:30.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000011",
+    "variantId": "gid://shopify/ProductVariant/2000031",
+    "productTitle": "Juniper Shirt 11",
+    "variantTitle": "Green / XL",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000031",
+    "barcode": "7000000000031",
+    "price": "83.97",
+    "status": "DRAFT",
+    "updatedAt": "2026-01-01T00:00:31.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000011",
+    "variantId": "gid://shopify/ProductVariant/2000032",
+    "productTitle": "Juniper Mug 11",
+    "variantTitle": "Black / S",
+    "vendor": "Juniper",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "S"
+    },
+    "sku": "SKU-JUN-000032",
+    "barcode": "7000000000032",
+    "price": "35.44",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:32.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000011",
+    "variantId": "gid://shopify/ProductVariant/2000033",
+    "productTitle": "Northstar Shoes 11",
+    "variantTitle": "Natural / S",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "S"
+    },
+    "sku": "SKU-NOR-000033",
+    "barcode": "7000000000033",
+    "price": "118.94",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:33.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000012",
+    "variantId": "gid://shopify/ProductVariant/2000034",
+    "productTitle": "Acme Hat 12",
+    "variantTitle": "Black / XL",
+    "vendor": "Acme",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-ACM-000034",
+    "barcode": "7000000000034",
+    "price": "143.82",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:34.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000012",
+    "variantId": "gid://shopify/ProductVariant/2000035",
+    "productTitle": "Redwood Bag 12",
+    "variantTitle": "Green / XS",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XS"
+    },
+    "sku": "SKU-RED-000035",
+    "barcode": "7000000000035",
+    "price": "168.68",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:35.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000012",
+    "variantId": "gid://shopify/ProductVariant/2000036",
+    "productTitle": "Orbit Mug 12",
+    "variantTitle": "Red / M",
+    "vendor": "Orbit",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-ORB-000036",
+    "barcode": "7000000000036",
+    "price": "101.31",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:36.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000013",
+    "variantId": "gid://shopify/ProductVariant/2000037",
+    "productTitle": "Orbit Hat 13",
+    "variantTitle": "Red / XS",
+    "vendor": "Orbit",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": "SKU-ORB-000037",
+    "barcode": "7000000000037",
+    "price": "103.40",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:37.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000013",
+    "variantId": "gid://shopify/ProductVariant/2000038",
+    "productTitle": "Juniper Shoes 13",
+    "variantTitle": "Red / L",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-JUN-000038",
+    "barcode": "7000000000038",
+    "price": "129.75",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:38.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000013",
+    "variantId": "gid://shopify/ProductVariant/2000039",
+    "productTitle": "Redwood Shoes 13",
+    "variantTitle": "Red / L",
+    "vendor": "Redwood",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000039",
+    "barcode": "7000000000039",
+    "price": "165.04",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:39.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000014",
+    "variantId": "gid://shopify/ProductVariant/2000040",
+    "productTitle": "Acme Shirt 14",
+    "variantTitle": "Black / L",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "L"
+    },
+    "sku": "SKU-ACM-000040",
+    "barcode": "7000000000040",
+    "price": "17.66",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:40.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000014",
+    "variantId": "gid://shopify/ProductVariant/2000041",
+    "productTitle": "Orbit Shoes 14",
+    "variantTitle": "Natural / M",
+    "vendor": "Orbit",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "M"
+    },
+    "sku": "SKU-ORB-000041",
+    "barcode": "7000000000041",
+    "price": "21.98",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:41.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000014",
+    "variantId": "gid://shopify/ProductVariant/2000042",
+    "productTitle": "Orbit Bag 14",
+    "variantTitle": "Natural / L",
+    "vendor": "Orbit",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "L"
+    },
+    "sku": "SKU-ORB-000042",
+    "barcode": "7000000000042",
+    "price": "79.75",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:42.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000015",
+    "variantId": "gid://shopify/ProductVariant/2000043",
+    "productTitle": "Redwood Shoes 15",
+    "variantTitle": "Natural / M",
+    "vendor": "Redwood",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "M"
+    },
+    "sku": "SKU-RED-000043",
+    "barcode": "7000000000043",
+    "price": "107.53",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:43.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000015",
+    "variantId": "gid://shopify/ProductVariant/2000044",
+    "productTitle": "Acme Shirt 15",
+    "variantTitle": "Red / M",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-ACM-000044",
+    "barcode": "7000000000044",
+    "price": "104.80",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:44.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000015",
+    "variantId": "gid://shopify/ProductVariant/2000045",
+    "productTitle": "Juniper Mug 15",
+    "variantTitle": "Black / XL",
+    "vendor": "Juniper",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000045",
+    "barcode": "7000000000045",
+    "price": "128.20",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:45.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000016",
+    "variantId": "gid://shopify/ProductVariant/2000046",
+    "productTitle": "Juniper Shirt 16",
+    "variantTitle": "Red / XL",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000046",
+    "barcode": "7000000000046",
+    "price": "127.91",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:46.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000016",
+    "variantId": "gid://shopify/ProductVariant/2000047",
+    "productTitle": "Redwood Bag 16",
+    "variantTitle": "Blue / XL",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000047",
+    "barcode": "7000000000047",
+    "price": "195.23",
+    "status": "ARCHIVED",
+    "updatedAt": "2026-01-01T00:00:47.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000016",
+    "variantId": "gid://shopify/ProductVariant/2000048",
+    "productTitle": "Redwood Bag 16",
+    "variantTitle": "Green / S",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": "SKU-RED-000048",
+    "barcode": "7000000000048",
+    "price": "84.52",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:48.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000017",
+    "variantId": "gid://shopify/ProductVariant/2000049",
+    "productTitle": "Northstar Hat 17",
+    "variantTitle": "Red / S",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SKU-NOR-000049",
+    "barcode": "7000000000049",
+    "price": "169.95",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:49.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000017",
+    "variantId": "gid://shopify/ProductVariant/2000050",
+    "productTitle": "Redwood Mug 17",
+    "variantTitle": "Green / M",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "M"
+    },
+    "sku": "SKU-RED-000050",
+    "barcode": "7000000000050",
+    "price": "86.85",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:50.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000017",
+    "variantId": "gid://shopify/ProductVariant/2000051",
+    "productTitle": "Acme Bag 17",
+    "variantTitle": "Red / L",
+    "vendor": "Acme",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-ACM-000051",
+    "barcode": "7000000000051",
+    "price": "11.71",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:51.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000018",
+    "variantId": "gid://shopify/ProductVariant/2000052",
+    "productTitle": "Juniper Mug 18",
+    "variantTitle": "Natural / XS",
+    "vendor": "Juniper",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XS"
+    },
+    "sku": "SKU-JUN-000052",
+    "barcode": "7000000000052",
+    "price": "45.45",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:52.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000018",
+    "variantId": "gid://shopify/ProductVariant/2000053",
+    "productTitle": "Redwood Shoes 18",
+    "variantTitle": "Black / XL",
+    "vendor": "Redwood",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000053",
+    "barcode": "7000000000053",
+    "price": "183.42",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:53.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000018",
+    "variantId": "gid://shopify/ProductVariant/2000054",
+    "productTitle": "Northstar Hat 18",
+    "variantTitle": "Blue / S",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "S"
+    },
+    "sku": "SKU-NOR-000054",
+    "barcode": "7000000000054",
+    "price": "112.10",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:54.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000019",
+    "variantId": "gid://shopify/ProductVariant/2000055",
+    "productTitle": "Redwood Shirt 19",
+    "variantTitle": "Red / XS",
+    "vendor": "Redwood",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": "SKU-RED-000055",
+    "barcode": "7000000000055",
+    "price": "183.86",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:55.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000019",
+    "variantId": "gid://shopify/ProductVariant/2000056",
+    "productTitle": "Juniper Bag 19",
+    "variantTitle": "Black / L",
+    "vendor": "Juniper",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "L"
+    },
+    "sku": "SKU-JUN-000056",
+    "barcode": "7000000000056",
+    "price": "198.00",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:56.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000019",
+    "variantId": "gid://shopify/ProductVariant/2000057",
+    "productTitle": "Redwood Shirt 19",
+    "variantTitle": "Green / L",
+    "vendor": "Redwood",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000057",
+    "barcode": "7000000000057",
+    "price": "69.88",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:57.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000020",
+    "variantId": "gid://shopify/ProductVariant/2000058",
+    "productTitle": "Redwood Bag 20",
+    "variantTitle": "Red / XL",
+    "vendor": "Redwood",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000058",
+    "barcode": "7000000000058",
+    "price": "162.38",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:58.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000020",
+    "variantId": "gid://shopify/ProductVariant/2000059",
+    "productTitle": "Northstar Shirt 20",
+    "variantTitle": "Natural / XS",
+    "vendor": "Northstar",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XS"
+    },
+    "sku": "SKU-NOR-000059",
+    "barcode": "7000000000059",
+    "price": "193.83",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:59.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000020",
+    "variantId": "gid://shopify/ProductVariant/2000060",
+    "productTitle": "Acme Hat 20",
+    "variantTitle": "Black / M",
+    "vendor": "Acme",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "M"
+    },
+    "sku": "SKU-ACM-000060",
+    "barcode": "7000000000060",
+    "price": "188.22",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000021",
+    "variantId": "gid://shopify/ProductVariant/2000061",
+    "productTitle": "Acme Shirt 21",
+    "variantTitle": "Black / XS",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-ACM-000061",
+    "barcode": "7000000000061",
+    "price": "129.52",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:01.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000021",
+    "variantId": "gid://shopify/ProductVariant/2000062",
+    "productTitle": "Orbit Shirt 21",
+    "variantTitle": "Black / XL",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-ORB-000062",
+    "barcode": "7000000000062",
+    "price": "47.08",
+    "status": "DRAFT",
+    "updatedAt": "2026-01-01T00:00:02.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000021",
+    "variantId": "gid://shopify/ProductVariant/2000063",
+    "productTitle": "Northstar Shoes 21",
+    "variantTitle": "Blue / XL",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XL"
+    },
+    "sku": "SKU-NOR-000063",
+    "barcode": "7000000000063",
+    "price": "82.26",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:03.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000022",
+    "variantId": "gid://shopify/ProductVariant/2000064",
+    "productTitle": "Northstar Hat 22",
+    "variantTitle": "Red / M",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-NOR-000064",
+    "barcode": "7000000000064",
+    "price": "15.55",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:04.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000022",
+    "variantId": "gid://shopify/ProductVariant/2000065",
+    "productTitle": "Acme Bag 22",
+    "variantTitle": "Blue / L",
+    "vendor": "Acme",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "L"
+    },
+    "sku": "SKU-ACM-000065",
+    "barcode": "7000000000065",
+    "price": "128.83",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:05.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000022",
+    "variantId": "gid://shopify/ProductVariant/2000066",
+    "productTitle": "Acme Shoes 22",
+    "variantTitle": "Red / L",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-ACM-000066",
+    "barcode": "7000000000066",
+    "price": "168.72",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:06.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000023",
+    "variantId": "gid://shopify/ProductVariant/2000067",
+    "productTitle": "Juniper Shoes 23",
+    "variantTitle": "Green / XS",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XS"
+    },
+    "sku": "SKU-JUN-000067",
+    "barcode": "7000000000067",
+    "price": "84.73",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:07.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000023",
+    "variantId": "gid://shopify/ProductVariant/2000068",
+    "productTitle": "Orbit Hat 23",
+    "variantTitle": "Blue / XS",
+    "vendor": "Orbit",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "XS"
+    },
+    "sku": "SKU-ORB-000068",
+    "barcode": "7000000000068",
+    "price": "124.48",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:08.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000023",
+    "variantId": "gid://shopify/ProductVariant/2000069",
+    "productTitle": "Acme Shirt 23",
+    "variantTitle": "Black / XS",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-ACM-000069",
+    "barcode": "7000000000069",
+    "price": "160.37",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:09.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000024",
+    "variantId": "gid://shopify/ProductVariant/2000070",
+    "productTitle": "Orbit Shirt 24",
+    "variantTitle": "Black / XL",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-ORB-000070",
+    "barcode": "7000000000070",
+    "price": "128.66",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:10.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000024",
+    "variantId": "gid://shopify/ProductVariant/2000071",
+    "productTitle": "Redwood Hat 24",
+    "variantTitle": "Blue / M",
+    "vendor": "Redwood",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "M"
+    },
+    "sku": "SKU-RED-000071",
+    "barcode": "7000000000071",
+    "price": "30.49",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:11.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000024",
+    "variantId": "gid://shopify/ProductVariant/2000072",
+    "productTitle": "Redwood Shirt 24",
+    "variantTitle": "Green / XL",
+    "vendor": "Redwood",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000072",
+    "barcode": "7000000000072",
+    "price": "140.17",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:12.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000025",
+    "variantId": "gid://shopify/ProductVariant/2000073",
+    "productTitle": "Redwood Hat 25",
+    "variantTitle": "Natural / XL",
+    "vendor": "Redwood",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000073",
+    "barcode": "7000000000073",
+    "price": "189.61",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:13.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000025",
+    "variantId": "gid://shopify/ProductVariant/2000074",
+    "productTitle": "Northstar Hat 25",
+    "variantTitle": "Green / XL",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": "SKU-NOR-000074",
+    "barcode": "7000000000074",
+    "price": "82.26",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:14.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000025",
+    "variantId": "gid://shopify/ProductVariant/2000075",
+    "productTitle": "Juniper Shoes 25",
+    "variantTitle": "Natural / L",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "L"
+    },
+    "sku": "SKU-JUN-000075",
+    "barcode": "7000000000075",
+    "price": "123.65",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:15.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000026",
+    "variantId": "gid://shopify/ProductVariant/2000076",
+    "productTitle": "Redwood Mug 26",
+    "variantTitle": "Red / S",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SKU-RED-000076",
+    "barcode": "7000000000076",
+    "price": "38.22",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:16.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000026",
+    "variantId": "gid://shopify/ProductVariant/2000077",
+    "productTitle": "Orbit Shirt 26",
+    "variantTitle": "Red / S",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SKU-ORB-000077",
+    "barcode": "7000000000077",
+    "price": "121.06",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:17.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000026",
+    "variantId": "gid://shopify/ProductVariant/2000078",
+    "productTitle": "Orbit Shoes 26",
+    "variantTitle": "Black / XS",
+    "vendor": "Orbit",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-ORB-000078",
+    "barcode": "7000000000078",
+    "price": "147.09",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:18.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000027",
+    "variantId": "gid://shopify/ProductVariant/2000079",
+    "productTitle": "Juniper Shoes 27",
+    "variantTitle": "Blue / S",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "S"
+    },
+    "sku": "SKU-JUN-000079",
+    "barcode": "7000000000079",
+    "price": "40.85",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:19.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000027",
+    "variantId": "gid://shopify/ProductVariant/2000080",
+    "productTitle": "Northstar Mug 27",
+    "variantTitle": "Red / XS",
+    "vendor": "Northstar",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": "SKU-NOR-000080",
+    "barcode": "7000000000080",
+    "price": "178.45",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:20.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000027",
+    "variantId": "gid://shopify/ProductVariant/2000081",
+    "productTitle": "Redwood Mug 27",
+    "variantTitle": "Natural / M",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "M"
+    },
+    "sku": "SKU-RED-000081",
+    "barcode": "7000000000081",
+    "price": "58.16",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:21.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000028",
+    "variantId": "gid://shopify/ProductVariant/2000082",
+    "productTitle": "Northstar Hat 28",
+    "variantTitle": "Red / XL",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XL"
+    },
+    "sku": "SKU-NOR-000082",
+    "barcode": "7000000000082",
+    "price": "157.22",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:22.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000028",
+    "variantId": "gid://shopify/ProductVariant/2000083",
+    "productTitle": "Juniper Shoes 28",
+    "variantTitle": "Green / XL",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000083",
+    "barcode": "7000000000083",
+    "price": "52.39",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:23.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000028",
+    "variantId": "gid://shopify/ProductVariant/2000084",
+    "productTitle": "Acme Mug 28",
+    "variantTitle": "Red / XS",
+    "vendor": "Acme",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": "SKU-ACM-000084",
+    "barcode": "7000000000084",
+    "price": "81.41",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:24.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000029",
+    "variantId": "gid://shopify/ProductVariant/2000085",
+    "productTitle": "Acme Bag 29",
+    "variantTitle": "Black / M",
+    "vendor": "Acme",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "M"
+    },
+    "sku": "SKU-ACM-000085",
+    "barcode": "7000000000085",
+    "price": "125.15",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:25.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000029",
+    "variantId": "gid://shopify/ProductVariant/2000086",
+    "productTitle": "Orbit Shirt 29",
+    "variantTitle": "Natural / XL",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-ORB-000086",
+    "barcode": "7000000000086",
+    "price": "40.90",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:26.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000029",
+    "variantId": "gid://shopify/ProductVariant/2000087",
+    "productTitle": "Redwood Mug 29",
+    "variantTitle": "Natural / XL",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-RED-000087",
+    "barcode": "7000000000087",
+    "price": "122.28",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:27.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000030",
+    "variantId": "gid://shopify/ProductVariant/2000088",
+    "productTitle": "Orbit Shirt 30",
+    "variantTitle": "Natural / M",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "retail"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "M"
+    },
+    "sku": "SKU-ORB-000088",
+    "barcode": "7000000000088",
+    "price": "179.85",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:28.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000030",
+    "variantId": "gid://shopify/ProductVariant/2000089",
+    "productTitle": "Juniper Bag 30",
+    "variantTitle": "Blue / S",
+    "vendor": "Juniper",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "S"
+    },
+    "sku": "SKU-JUN-000089",
+    "barcode": "7000000000089",
+    "price": "54.62",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:29.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000030",
+    "variantId": "gid://shopify/ProductVariant/2000090",
+    "productTitle": "Juniper Shoes 30",
+    "variantTitle": "Red / M",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-JUN-000090",
+    "barcode": "7000000000090",
+    "price": "67.39",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:30.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000031",
+    "variantId": "gid://shopify/ProductVariant/2000091",
+    "productTitle": "Redwood Shoes 31",
+    "variantTitle": "Red / L",
+    "vendor": "Redwood",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000091",
+    "barcode": "7000000000091",
+    "price": "165.69",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:31.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000031",
+    "variantId": "gid://shopify/ProductVariant/2000092",
+    "productTitle": "Redwood Mug 31",
+    "variantTitle": "Blue / L",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000092",
+    "barcode": "7000000000092",
+    "price": "31.15",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:32.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000031",
+    "variantId": "gid://shopify/ProductVariant/2000093",
+    "productTitle": "Orbit Shirt 31",
+    "variantTitle": "Green / M",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "M"
+    },
+    "sku": "SKU-ORB-000093",
+    "barcode": "7000000000093",
+    "price": "125.30",
+    "status": "DRAFT",
+    "updatedAt": "2026-01-01T00:00:33.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000032",
+    "variantId": "gid://shopify/ProductVariant/2000094",
+    "productTitle": "Northstar Mug 32",
+    "variantTitle": "Red / M",
+    "vendor": "Northstar",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-NOR-000094",
+    "barcode": "7000000000094",
+    "price": "170.29",
+    "status": "ARCHIVED",
+    "updatedAt": "2026-01-01T00:00:34.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000032",
+    "variantId": "gid://shopify/ProductVariant/2000095",
+    "productTitle": "Acme Shoes 32",
+    "variantTitle": "Black / XS",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-ACM-000095",
+    "barcode": "7000000000095",
+    "price": "112.32",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:35.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000032",
+    "variantId": "gid://shopify/ProductVariant/2000096",
+    "productTitle": "Orbit Bag 32",
+    "variantTitle": "Black / M",
+    "vendor": "Orbit",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "M"
+    },
+    "sku": "SKU-ORB-000096",
+    "barcode": "7000000000096",
+    "price": "146.94",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:36.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000033",
+    "variantId": "gid://shopify/ProductVariant/2000097",
+    "productTitle": "Orbit Bag 33",
+    "variantTitle": "Red / L",
+    "vendor": "Orbit",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "L"
+    },
+    "sku": "SKU-ORB-000097",
+    "barcode": "7000000000097",
+    "price": "89.65",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:37.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000033",
+    "variantId": "gid://shopify/ProductVariant/2000098",
+    "productTitle": "Orbit Bag 33",
+    "variantTitle": "Black / XS",
+    "vendor": "Orbit",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-ORB-000098",
+    "barcode": "7000000000098",
+    "price": "18.36",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:38.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000033",
+    "variantId": "gid://shopify/ProductVariant/2000099",
+    "productTitle": "Juniper Shirt 33",
+    "variantTitle": "Natural / XL",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000099",
+    "barcode": "7000000000099",
+    "price": "93.30",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:39.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000034",
+    "variantId": "gid://shopify/ProductVariant/2000100",
+    "productTitle": "Orbit Hat 34",
+    "variantTitle": "Red / S",
+    "vendor": "Orbit",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SKU-ORB-000100",
+    "barcode": "7000000000100",
+    "price": "15.00",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:40.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000034",
+    "variantId": "gid://shopify/ProductVariant/2000101",
+    "productTitle": "Acme Shirt 34",
+    "variantTitle": "Green / XS",
+    "vendor": "Acme",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XS"
+    },
+    "sku": "SKU-ACM-000101",
+    "barcode": "7000000000101",
+    "price": "18.69",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:41.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000034",
+    "variantId": "gid://shopify/ProductVariant/2000102",
+    "productTitle": "Acme Shoes 34",
+    "variantTitle": "Red / M",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-ACM-000102",
+    "barcode": "7000000000102",
+    "price": "35.21",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:42.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000035",
+    "variantId": "gid://shopify/ProductVariant/2000103",
+    "productTitle": "Acme Mug 35",
+    "variantTitle": "Natural / S",
+    "vendor": "Acme",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "S"
+    },
+    "sku": "SKU-ACM-000103",
+    "barcode": "7000000000103",
+    "price": "146.87",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:43.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000035",
+    "variantId": "gid://shopify/ProductVariant/2000104",
+    "productTitle": "Acme Shoes 35",
+    "variantTitle": "Black / S",
+    "vendor": "Acme",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "S"
+    },
+    "sku": "SKU-ACM-000104",
+    "barcode": "7000000000104",
+    "price": "199.30",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:44.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000035",
+    "variantId": "gid://shopify/ProductVariant/2000105",
+    "productTitle": "Juniper Shirt 35",
+    "variantTitle": "Blue / M",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "M"
+    },
+    "sku": "SKU-JUN-000105",
+    "barcode": "7000000000105",
+    "price": "11.69",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:45.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000036",
+    "variantId": "gid://shopify/ProductVariant/2000106",
+    "productTitle": "Northstar Shoes 36",
+    "variantTitle": "Green / L",
+    "vendor": "Northstar",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "L"
+    },
+    "sku": "SKU-NOR-000106",
+    "barcode": "7000000000106",
+    "price": "12.62",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:46.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000036",
+    "variantId": "gid://shopify/ProductVariant/2000107",
+    "productTitle": "Orbit Shirt 36",
+    "variantTitle": "Green / S",
+    "vendor": "Orbit",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": "SKU-ORB-000107",
+    "barcode": "7000000000107",
+    "price": "54.32",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:47.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000036",
+    "variantId": "gid://shopify/ProductVariant/2000108",
+    "productTitle": "Acme Hat 36",
+    "variantTitle": "Blue / S",
+    "vendor": "Acme",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "S"
+    },
+    "sku": "SKU-ACM-000108",
+    "barcode": "7000000000108",
+    "price": "163.99",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:48.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000037",
+    "variantId": "gid://shopify/ProductVariant/2000109",
+    "productTitle": "Northstar Hat 37",
+    "variantTitle": "Natural / XL",
+    "vendor": "Northstar",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Natural",
+      "Size": "XL"
+    },
+    "sku": "SKU-NOR-000109",
+    "barcode": "7000000000109",
+    "price": "183.02",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:49.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000037",
+    "variantId": "gid://shopify/ProductVariant/2000110",
+    "productTitle": "Northstar Bag 37",
+    "variantTitle": "Red / S",
+    "vendor": "Northstar",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "S"
+    },
+    "sku": "SKU-NOR-000110",
+    "barcode": "7000000000110",
+    "price": "60.39",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:50.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000037",
+    "variantId": "gid://shopify/ProductVariant/2000111",
+    "productTitle": "Redwood Shoes 37",
+    "variantTitle": "Blue / L",
+    "vendor": "Redwood",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "online"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "L"
+    },
+    "sku": "SKU-RED-000111",
+    "barcode": "7000000000111",
+    "price": "150.79",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:51.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000038",
+    "variantId": "gid://shopify/ProductVariant/2000112",
+    "productTitle": "Northstar Bag 38",
+    "variantTitle": "Red / XS",
+    "vendor": "Northstar",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "XS"
+    },
+    "sku": "SKU-NOR-000112",
+    "barcode": null,
+    "price": "26.19",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:52.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000038",
+    "variantId": "gid://shopify/ProductVariant/2000113",
+    "productTitle": "Redwood Mug 38",
+    "variantTitle": "Green / S",
+    "vendor": "Redwood",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": "SKU-RED-000113",
+    "barcode": null,
+    "price": "82.62",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:53.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000038",
+    "variantId": "gid://shopify/ProductVariant/2000114",
+    "productTitle": "Juniper Shoes 38",
+    "variantTitle": "Blue / S",
+    "vendor": "Juniper",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "S"
+    },
+    "sku": "SKU-JUN-000114",
+    "barcode": null,
+    "price": "58.82",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:54.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000039",
+    "variantId": "gid://shopify/ProductVariant/2000115",
+    "productTitle": "Juniper Shirt 39",
+    "variantTitle": "Green / XL",
+    "vendor": "Juniper",
+    "productType": "Shirt",
+    "tags": [
+      "shirt",
+      "online"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "XL"
+    },
+    "sku": "SKU-JUN-000115",
+    "barcode": null,
+    "price": "123.96",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:55.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000039",
+    "variantId": "gid://shopify/ProductVariant/2000116",
+    "productTitle": "Acme Mug 39",
+    "variantTitle": "Blue / L",
+    "vendor": "Acme",
+    "productType": "Mug",
+    "tags": [
+      "mug",
+      "retail"
+    ],
+    "options": {
+      "Color": "Blue",
+      "Size": "L"
+    },
+    "sku": "SKU-ACM-000116",
+    "barcode": null,
+    "price": "130.60",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:56.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000039",
+    "variantId": "gid://shopify/ProductVariant/2000117",
+    "productTitle": "Northstar Bag 39",
+    "variantTitle": "Black / XS",
+    "vendor": "Northstar",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "online"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XS"
+    },
+    "sku": "SKU-NOR-000117",
+    "barcode": null,
+    "price": "42.54",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:57.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000040",
+    "variantId": "gid://shopify/ProductVariant/2000118",
+    "productTitle": "Orbit Shoes 40",
+    "variantTitle": "Black / XL",
+    "vendor": "Orbit",
+    "productType": "Shoes",
+    "tags": [
+      "shoes",
+      "retail"
+    ],
+    "options": {
+      "Color": "Black",
+      "Size": "XL"
+    },
+    "sku": "SKU-ORB-000118",
+    "barcode": null,
+    "price": "197.82",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:58.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000040",
+    "variantId": "gid://shopify/ProductVariant/2000119",
+    "productTitle": "Acme Hat 40",
+    "variantTitle": "Red / M",
+    "vendor": "Acme",
+    "productType": "Hat",
+    "tags": [
+      "hat",
+      "online"
+    ],
+    "options": {
+      "Color": "Red",
+      "Size": "M"
+    },
+    "sku": "SKU-ACM-000119",
+    "barcode": null,
+    "price": "152.47",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:59.000Z"
+  },
+  {
+    "productId": "gid://shopify/Product/1000040",
+    "variantId": "gid://shopify/ProductVariant/2000120",
+    "productTitle": "Juniper Bag 40",
+    "variantTitle": "Green / S",
+    "vendor": "Juniper",
+    "productType": "Bag",
+    "tags": [
+      "bag",
+      "retail"
+    ],
+    "options": {
+      "Color": "Green",
+      "Size": "S"
+    },
+    "sku": "SKU-JUN-000120",
+    "barcode": null,
+    "price": "66.41",
+    "status": "ACTIVE",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  }
+]
