@@ -25,7 +25,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://skuforge:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the VPS .env file}@db:5432/skuforge?schema=public
+      DATABASE_URL: ${DATABASE_URL:?Set a URL-encoded DATABASE_URL in the VPS .env file}
     networks:
       - default
       - traefik

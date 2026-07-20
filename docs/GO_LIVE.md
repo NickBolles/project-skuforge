@@ -24,7 +24,7 @@ Do not deploy until a human completes the week-0 competitor audit required by `P
 1. Run the schema-sync check.
 2. Review the committed PostgreSQL migration history under `prisma/postgres/migrations/`; apply it to a disposable PostgreSQL database with `npm run setup:postgres`, then production.
 3. Run typecheck, lint, the full tests, and production build.
-4. Run `shopify app deploy`, deploy the web service, and verify its health endpoint/startup logs.
+4. Run `shopify app deploy`, deploy the web service, and verify successful database migration plus startup logs.
 5. Install on a development store and approve the requested product scopes. Verify an offline session exists.
 
 ## 3. Webhooks and billing
