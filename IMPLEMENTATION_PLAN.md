@@ -1,5 +1,15 @@
 # SKUForge — Phased Implementation Plan
 
+> **Status — 2026-07-20: ✅ All phases implemented, adversarially reviewed, gap-audited, and hardened.**
+> 175 tests pass, the production build passes, and the Docker image builds (`project-skuforge`, 1.01 GB; Dockerfile was fixed this session).
+> `main` on GitHub is the source of truth. All BLOCKER/MAJOR gaps in [`GAP_REPORT.md`](./GAP_REPORT.md) are fixed
+> (`products/create` webhook registered, preview/apply scope parity, rule-aware malformed detection). The core uniqueness wedge audited clean.
+>
+> **Next steps:**
+> - **Deploy & live-test** → [`DEPLOYMENT_HANDOFF.md`](./DEPLOYMENT_HANDOFF.md) — VPS + Traefik + Shopify dev-store runbook. **Note:** this repo still needs a `docker-compose.yml` (web + Postgres) — see handoff §3a.
+> - **Remaining backlog** → [`GAP_REPORT.md`](./GAP_REPORT.md) §B: label-station UX (variant search/paging + template picker — gates the $19 Premium hook); GS1 UPC/EAN integration; single-instance/ops docs.
+> - **Human gate:** `docs/GO_LIVE.md` requires a week-0 competitor audit before public listing.
+
 > Engineer-ready build plan derived from `PLAN.md` / `README.md`. Each phase is scoped so a single
 > coding agent can execute it end-to-end and verify acceptance criteria **without any live
 > credentials** (no Shopify Partner keys, no hosted Postgres). Real creds are dropped in later via
