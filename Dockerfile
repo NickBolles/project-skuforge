@@ -1,18 +1,23 @@
 FROM node:20-alpine
 RUN apk add --no-cache openssl
 
-EXPOSE 3000
-
 WORKDIR /app
 
-ENV NODE_ENV=production
-
+# Install ALL dependencies. The production build needs devDependencies
+# (cross-env, @react-router/dev, vite, the prisma CLI), so we must NOT set
+# NODE_ENV=production or --omit=dev before building.
 COPY package.json package-lock.json* ./
-
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 COPY . .
 
+# Generate the Prisma client (uses the CLI from devDependencies) before bundling.
+RUN npm run prisma -- generate
+
 RUN npm run build
 
+# Runtime configuration. docker-start runs `prisma migrate deploy` (needs the
+# prisma CLI, kept above) then serves the built app.
+ENV NODE_ENV=production
+EXPOSE 3000
 CMD ["npm", "run", "docker-start"]
