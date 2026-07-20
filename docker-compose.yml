@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: skuforge
+      POSTGRES_USER: skuforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the VPS .env file}
+    volumes:
+      - skuforge-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skuforge -d skuforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set a URL-encoded DATABASE_URL in the VPS .env file}
+    networks:
+      - default
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-traefik}
+      - traefik.http.routers.skuforge.rule=Host(`${SKUFORGE_HOSTNAME:-skuforge.nickbolles.com}`)
+      - traefik.http.routers.skuforge.entrypoints=websecure
+      - traefik.http.routers.skuforge.tls=true
+      - traefik.http.routers.skuforge.tls.certresolver=${TRAEFIK_CERTRESOLVER:?Set TRAEFIK_CERTRESOLVER in the VPS .env file}
+      - traefik.http.services.skuforge.loadbalancer.server.port=3000
+
+volumes:
+  skuforge-postgres:
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}

@@ -21,7 +21,7 @@ const scriptPath = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   const root = resolve(dirname(scriptPath), "..");
   const sqlitePath = resolve(root, "prisma/schema.prisma");
-  const postgresPath = resolve(root, "prisma/schema.postgres.prisma");
+  const postgresPath = resolve(root, "prisma/postgres/schema.prisma");
   if (!(await schemasAreInSync(sqlitePath, postgresPath))) {
     console.error("Prisma schemas differ outside their datasource blocks.");
     process.exitCode = 1;

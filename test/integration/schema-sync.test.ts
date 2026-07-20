@@ -10,7 +10,7 @@ describe("dual Prisma schemas", () => {
     await expect(
       schemasAreInSync(
         resolve("prisma/schema.prisma"),
-        resolve("prisma/schema.postgres.prisma"),
+        resolve("prisma/postgres/schema.prisma"),
       ),
     ).resolves.toBe(true);
   });

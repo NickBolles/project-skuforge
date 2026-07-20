@@ -6,7 +6,7 @@
 > (`products/create` webhook registered, preview/apply scope parity, rule-aware malformed detection). The core uniqueness wedge audited clean.
 >
 > **Next steps:**
-> - **Deploy & live-test** → [`DEPLOYMENT_HANDOFF.md`](./DEPLOYMENT_HANDOFF.md) — VPS + Traefik + Shopify dev-store runbook. **Note:** this repo still needs a `docker-compose.yml` (web + Postgres) — see handoff §3a.
+> - **Deploy & live-test** → [`DEPLOYMENT_HANDOFF.md`](./DEPLOYMENT_HANDOFF.md) — VPS + Traefik + Shopify dev-store runbook. Production deployment is supplied by `docker-compose.yml` and PostgreSQL migrations under `prisma/postgres/migrations/`.
 > - **Remaining backlog** → [`GAP_REPORT.md`](./GAP_REPORT.md) §B: label-station UX (variant search/paging + template picker — gates the $19 Premium hook); GS1 UPC/EAN integration; single-instance/ops docs.
 > - **Human gate:** `docs/GO_LIVE.md` requires a week-0 competitor audit before public listing.
 
@@ -25,7 +25,7 @@
 |---|---|---|
 | App framework | **Official Shopify app template — React Router 7** (`Shopify/shopify-app-template-react-router`, `@shopify/shopify-app-react-router`) | Remix merged into React Router v7; the Remix template is deprecated in favor of this one. Scaffold with `shopify app init --template=https://github.com/Shopify/shopify-app-template-react-router`. If CLI init requires Partner login, vendor the template by `git clone` + strip `.git` (Phase 0 covers both paths). |
 | UI | **Polaris** (whatever the template ships — Polaris React or Polaris web components; keep the template's default, don't fight it) | Shared patterns with AlertProof per portfolio note. |
-| ORM / DB | **Prisma**. Dev + tests: **SQLite** (template default, zero infra). Prod: **Postgres** via `DATABASE_URL` swap. | Prisma cannot switch `provider` via env var → keep two schema files (`prisma/schema.prisma` = sqlite, `prisma/schema.postgres.prisma` = identical models, postgres provider) and a sync-check script. **Model portability rules:** no Prisma `enum`s (use `String` + app-level constants), no `Json` columns (use `String` holding JSON), no pg-specific native types. |
+| ORM / DB | **Prisma**. Dev + tests: **SQLite** (template default, zero infra). Prod: **Postgres** via `DATABASE_URL` swap. | Prisma cannot switch `provider` via env var → keep two schema files (`prisma/schema.prisma` = sqlite, `prisma/postgres/schema.prisma` = identical models, postgres provider) and a sync-check script. **Model portability rules:** no Prisma `enum`s (use `String` + app-level constants), no `Json` columns (use `String` holding JSON), no pg-specific native types. |
 | Shopify data access | `ShopifyCatalog` **interface** with two implementations: `GraphqlShopifyCatalog` (bulk-operation reads, throttled batched mutation writes) and `InMemoryShopifyCatalog` (fake, fixture-seeded). See §1.3. |
 | Barcode | **In-house pure Code 128 encoder** (`app/core/barcode/`). The spec is small (3 code sets, checksum, start/stop). Output = abstract bar/space module widths → rendered as **vector rectangles** into pdf-lib (crisp on thermal printers, no raster deps, no canvas/native modules on Windows). Dev-dependency `bwip-js` used **only in tests** as a cross-check oracle. |
 | PDF | **pdf-lib** (pure JS, no native deps). Label templates are data (geometry specs), not code. |
@@ -56,7 +56,8 @@ skuforge/
 │  └─ db.server.ts
 ├─ prisma/
 │  ├─ schema.prisma             # sqlite (dev/test)
-│  └─ schema.postgres.prisma    # postgres (prod) — kept in sync by scripts/check-schema-sync
+│  └─ postgres/
+│     └─ schema.prisma          # postgres (prod) — kept in sync by scripts/check-schema-sync
 ├─ test/
 │  ├─ fixtures/                 # fixture catalog generator + committed small fixture JSON
 │  └─ integration/
@@ -299,7 +300,7 @@ model WebhookEvent {
 |---|---|---|
 | `SHOPIFY_API_KEY` / `SHOPIFY_API_SECRET` | yes (OAuth, session tokens, webhook HMAC; **missing in prod = hard boot failure, never a mock fallback**) | set `AUTH_MODE=mock` explicitly (non-prod only): fixed dev session, `InMemoryShopifyCatalog`, webhook HMAC check bypassed with logged warning |
 | `SHOPIFY_APP_URL`, `SCOPES` (`read_products,write_products`) | yes | defaults: `http://localhost:3000`, scopes string constant |
-| `DATABASE_URL` | yes (Postgres) | SQLite `file:./dev.sqlite` via `schema.prisma`; prod uses `schema.postgres.prisma` |
+| `DATABASE_URL` | yes (Postgres) | SQLite `file:./dev.sqlite` via `schema.prisma`; prod uses `prisma/postgres/schema.prisma` |
 | `CRON_SECRET` | yes (protects `/api/cron/*`) | any string in `.env`; local runner script passes it |
 | `MOCK_PLAN` | no | dev-only: `free|pro|premium` for the FakeBillingGateway |
 | `AUTH_MODE` | no (defaults to `shopify`) | must be explicitly set to `mock` locally (`dev:mock` script does this); rejected outright when `NODE_ENV=production` |
@@ -317,7 +318,7 @@ Conventions for every phase: work only in the listed files (+ tests); `npm run c
 ### Phase 0 — Scaffold, config, DB, mock-auth spine
 **Goal:** Running app skeleton in mock mode with CI-style checks, Prisma schema migrated, fixture generator, and the core-purity lint in place.
 
-**Files:** entire template scaffold; `prisma/schema.prisma` + `schema.postgres.prisma` (all §2 models); `app/services/context.server.ts`; `app/adapters/shopify/catalog.ts` (interface + types only); `app/adapters/billing/gateway.ts` (interface + `FakeBillingGateway`); `test/fixtures/gen-catalog.ts` + committed `catalog-small.json` (~120 variants incl. seeded duplicates/malformed/missing); `scripts/check-schema-sync.mjs`; `scripts/gen-fixture.mjs`; ESLint rule (or vitest import-graph test) forbidding non-core imports inside `app/core`; `.env.example` documenting every var in §3; `vitest.config.ts`; npm scripts: `dev:mock`, `check`, `gen:fixture`.
+**Files:** entire template scaffold; `prisma/schema.prisma` + `prisma/postgres/schema.prisma` (all §2 models); `app/services/context.server.ts`; `app/adapters/shopify/catalog.ts` (interface + types only); `app/adapters/billing/gateway.ts` (interface + `FakeBillingGateway`); `test/fixtures/gen-catalog.ts` + committed `catalog-small.json` (~120 variants incl. seeded duplicates/malformed/missing); `scripts/check-schema-sync.mjs`; `scripts/gen-fixture.mjs`; ESLint rule (or vitest import-graph test) forbidding non-core imports inside `app/core`; `.env.example` documenting every var in §3; `vitest.config.ts`; npm scripts: `dev:mock`, `check`, `gen:fixture`.
 
 **Key notes:** Try `shopify app init --template=...react-router`; if the CLI insists on Partner login, `git clone` the template and strip git metadata — record which path was taken in `docs/DECISIONS.md`. Do not modify the template's `Session` model. Home route (`/app`) renders a Polaris page showing shop domain, plan, and variant count from the catalog fake — proves the whole spine.
 
