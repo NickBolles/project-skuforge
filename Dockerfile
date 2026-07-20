@@ -12,6 +12,10 @@ RUN npm ci && npm cache clean --force
 COPY . .
 
 # Generate the production PostgreSQL Prisma client before bundling.
+# Prisma validates the datasource URL while generating the client. This is a
+# non-secret build-only default; Compose replaces it with DATABASE_URL at runtime.
+ARG DATABASE_URL=postgresql://skuforge:build-only@localhost:5432/skuforge
+ENV DATABASE_URL=${DATABASE_URL}
 RUN npm run generate:postgres
 
 RUN npm run build
