@@ -9,6 +9,7 @@ import { createRule, ensureShop, parseRuleConfig } from "../../app/services/rule
 import { allocateSequenceBlock } from "../../app/services/sequence.server";
 import { scanCatalog } from "../../app/core/validate";
 import { generateCatalog } from "../fixtures/gen-catalog";
+import { previewRule } from "../../app/services/preview.server";
 
 const shopDomain = "phase5-generation.myshopify.test";
 const baseConfig = parseRuleConfig({ casing: "upper", stripNonAlphanumeric: true });
@@ -69,6 +70,53 @@ describe("generation jobs", () => {
     expect(await db.duplicateScan.count({ where: { shopId: planned.shopId, trigger: "post_generation" } })).toBe(1);
   });
 
+  it("selects the identical scoped variant set in preview and apply for all-missing and selected jobs", async () => {
+    const catalog = new InMemoryShopifyCatalog([
+      variant("v1", null, "Acme"),
+      variant("v2", null, "Other"),
+    ]);
+    const scopedConfig = parseRuleConfig({
+      casing: "upper",
+      stripNonAlphanumeric: true,
+      scope: { vendors: ["Acme"], productTypes: ["Shirt"], tags: [] },
+    });
+    const createdRule = await createRule(db, shopDomain, {
+      name: "Scoped rule",
+      pattern: "{vendor:3}-{seq:4}",
+      config: scopedConfig,
+    });
+    const shop = await ensureShop(db, shopDomain);
+    const preview = await previewRule({
+      db,
+      catalog,
+      shopId: shop.id,
+      ruleId: createdRule.id,
+      pattern: createdRule.pattern,
+      config: scopedConfig,
+    });
+    const allMissing = await createBulkGenerationJob(db, catalog, {
+      shopDomain,
+      ruleSetId: createdRule.id,
+      trigger: "all_missing",
+      idempotencyKey: "scope-parity-all-missing",
+    });
+    const selected = await createBulkGenerationJob(db, catalog, {
+      shopDomain,
+      ruleSetId: createdRule.id,
+      trigger: "selected",
+      selectedVariantIds: ["v1", "v2"],
+      idempotencyKey: "scope-parity-selected",
+    });
+
+    const previewIds = preview.rows.map((row) => row.variantId);
+    expect(allMissing.items.map((item) => item.variantId)).toEqual(previewIds);
+    expect(selected.items.map((item) => item.variantId)).toEqual(previewIds);
+
+    await runGenerationJob(db, catalog, allMissing.id);
+    expect(catalog.snapshot().find((item) => item.variantId === "v1")!.sku).toMatch(/^ACM-/);
+    expect(catalog.snapshot().find((item) => item.variantId === "v2")!.sku).toBeNull();
+  });
+
   it("records compare-and-set conflicts as completed_with_skips", async () => {
     const catalog = new InMemoryShopifyCatalog([variant("v1", null), variant("v2", "EXISTING")], { simulate: { conflictVariantIds: ["v1"] } });
     const createdRule = await rule();
@@ -105,6 +153,33 @@ describe("generation jobs", () => {
     expect(await db.generationJob.count({ where: { shopId: shop.id } })).toBe(1);
     expect(lookupSpy.mock.calls.length).toBeGreaterThanOrEqual(2);
     expect(catalog.snapshot().find((item) => item.variantId === "v1")!.sku).not.toBe("ACM-0001");
+  });
+
+  it("records an out-of-scope webhook variant as skipped without writing it", async () => {
+    const catalog = new InMemoryShopifyCatalog([variant("v1", null, "Other")]);
+    await createRule(db, shopDomain, {
+      name: "Acme only",
+      pattern: "{vendor:3}-{seq:4}",
+      config: parseRuleConfig({ scope: { vendors: ["Acme"], productTypes: [], tags: [] } }),
+      isDefault: true,
+    });
+    const shop = await ensureShop(db, shopDomain);
+    await db.shop.update({ where: { id: shop.id }, data: { settings: JSON.stringify({ autoGenerateOnCreate: true }) } });
+
+    const result = await handleProductsCreate({
+      db,
+      catalog,
+      shopDomain,
+      webhookId: "event-out-of-scope",
+      payload: { variantIds: ["v1"] },
+      plan: "pro",
+    });
+    const job = await db.generationJob.findUniqueOrThrow({ where: { id: result.jobId! }, include: { items: true } });
+    expect(job.status).toBe("completed_with_skips");
+    expect(job.items).toEqual([
+      expect.objectContaining({ variantId: "v1", status: "skipped_conflict", proposedSku: null }),
+    ]);
+    expect(catalog.snapshot()[0]!.sku).toBeNull();
   });
 
   it("keeps multiple variants from one webhook unique without a sequence token", async () => {

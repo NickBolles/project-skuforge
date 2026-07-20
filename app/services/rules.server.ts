@@ -1,6 +1,6 @@
 import type { PrismaClient, SkuRuleSet } from "@prisma/client";
 import { z } from "zod";
-import { parsePattern, type PatternParseError, type SkuRenderConfig } from "../core/sku";
+import { parsePattern, patternToRegex, type PatternParseError, type SkuRenderConfig } from "../core/sku";
 
 const stringList = z.array(z.string().trim().min(1)).max(100).default([]);
 
@@ -52,6 +52,19 @@ export function parseRuleConfig(value: string | unknown): RuleConfig {
       error instanceof Error ? error.message : "Rule configuration is invalid.",
     );
   }
+}
+
+export function ruleSkuPattern(rule: Pick<SkuRuleSet, "pattern" | "config">): RegExp {
+  const parsed = parsePattern(rule.pattern);
+  if (!parsed.ok) {
+    const first = parsed.errors[0]!;
+    throw new RuleValidationError(
+      "INVALID_PATTERN",
+      `${first.message} (position ${first.position})`,
+      parsed.errors,
+    );
+  }
+  return patternToRegex(parsed.ast, parseRuleConfig(rule.config));
 }
 
 function validateInput(input: RuleInput): { name: string; pattern: string; config: RuleConfig } {

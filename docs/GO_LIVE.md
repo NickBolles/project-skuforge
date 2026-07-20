@@ -29,8 +29,8 @@ Do not deploy until a human completes the week-0 competitor audit required by `P
 
 ## 3. Webhooks and billing
 
-1. Verify Shopify registered `app/uninstalled`, `app/scopes_update`, `app_subscriptions/update`, `customers/data_request`, `customers/redact`, and `shop/redact` at the HTTPS routes in `shopify.app.toml`.
-2. Send signed test deliveries. Confirm an invalid HMAC returns 401, uninstall stops cron and cleans sessions, and shop redaction removes application data.
+1. Verify Shopify registered `products/create`, `app/uninstalled`, `app/scopes_update`, `app_subscriptions/update`, `customers/data_request`, `customers/redact`, and `shop/redact` at the HTTPS routes in `shopify.app.toml`.
+2. Send signed test deliveries, including `products/create`. Confirm an invalid HMAC returns 401, below-plan or disabled product automation is acknowledged with 200, uninstall stops cron and cleans sessions, and shop redaction removes application data.
 3. Temporarily enable `BILLING_TEST=true` on the dev store. Approve Pro and Premium test subscriptions, verify the update webhook changes entitlements, and test cancellation back to Free. Disable test charges before production review.
 
 ## 4. Real-store smoke test
@@ -38,8 +38,9 @@ Do not deploy until a human completes the week-0 competitor audit required by `P
 1. Create a default rule and preview it without writing.
 2. Scan a controlled store and compare totals manually. Never display “0 duplicate SKUs” without a completed scan.
 3. Generate a small selected batch; verify collision resolution, compare-and-set behavior, and the mandatory post-run scan.
-4. Confirm automation is Pro-only, labels and CSV are Premium-only, and a 51-variant Free store receives a clear 403 upgrade reason.
-5. Print one Avery and one thermal PDF at actual size; confirm geometry and barcode readability. Confirm the UI does not imply internal Code 128 values are GS1 UPC/EAN identifiers.
+4. Create a product on the development store with Pro automation enabled; confirm the `products/create` delivery reaches `/webhooks/products-create`, creates one webhook generation job, and a replay is deduplicated.
+5. Confirm automation is Pro-only, labels and CSV are Premium-only, and a 51-variant Free store receives a clear 403 upgrade reason.
+6. Print one Avery and one thermal PDF at actual size; confirm geometry and barcode readability. Confirm the UI does not imply internal Code 128 values are GS1 UPC/EAN identifiers.
 
 ## 5. Nightly scheduler and listing
 

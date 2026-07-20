@@ -76,8 +76,8 @@ export function EditorPage({ data, actionResult }: { data: Awaited<ReturnType<ty
         <p><a href={`/api/csv/export?${new URLSearchParams(data.filters).toString()}`}>Export this filtered view as CSV</a> · <a href="/app/csv">Import CSV</a></p>
         {truthy(data.filters.duplicates ?? null) ? (
           data.duplicateScan
-            ? <p>Duplicate results from {data.duplicateScan.finishedAt?.toISOString() ?? "the latest completed scan"}. <a href="/app/scans">Run a fresh scan</a>.</p>
-            : <p>No completed duplicate scan is available. <a href="/app/scans">Run a scan</a>.</p>
+            ? <p>Duplicate results from {data.duplicateScan.finishedAt?.toISOString() ?? "the latest completed scan"}. <a href="/app/scan">Run a fresh scan</a>.</p>
+            : <p>No completed duplicate scan is available. <a href="/app/scan">Run a scan</a>.</p>
         ) : null}
       </s-section>
       <s-section heading="Variants">

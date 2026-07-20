@@ -5,7 +5,8 @@ import { validateCsvImport, type CsvVariantRow } from "../core/csv";
 import { parsePattern, render, type PatternAst } from "../core/sku";
 import { assignUnique, canWriteBarcode, DupIndex, normalizeSku } from "../core/validate";
 import { acquireJobLock, heartbeatJobLock, JobLockedError, releaseJobLock } from "./job-lock.server";
-import { ensureShop, getRule, parseRuleConfig } from "./rules.server";
+import { variantInScope } from "./rule-scope";
+import { ensureShop, getRule, parseRuleConfig, ruleSkuPattern } from "./rules.server";
 import { allocateSequenceBlock } from "./sequence.server";
 import { verifyGenerationRun } from "./verification.server";
 
@@ -181,6 +182,7 @@ export async function createBulkGenerationJob(
     const all = await catalogSnapshot(catalog, shop.id);
     const selected = new Set(input.selectedVariantIds ?? []);
     const targets = all.filter((variant) => {
+      if (!variantInScope(variant, config)) return false;
       if (input.trigger === "all_missing") return variant.sku === null || variant.sku.trim() === "";
       return selected.has(variant.variantId);
     });
@@ -274,14 +276,28 @@ export async function enqueueSingleVariantJob(
   const rule = await getRule(db, input.shopDomain, input.ruleSetId);
   const record = await createJobRecord(db, { shopId: shop.id, ruleSetId: rule.id, trigger: input.trigger, idempotencyKey: input.idempotencyKey, fields: ["sku"] });
   if (record.created) {
+    const config = parseRuleConfig(rule.config);
     const variants = await catalog.getVariants(input.variantIds);
-    const targets = input.trigger === "fix"
+    const candidates = input.trigger === "fix"
       ? variants
       : variants.filter((variant) => variant.sku === null || variant.sku.trim() === "");
-    if (targets.length) {
-      await db.generationJobItem.createMany({ data: targets.map((variant) => ({ jobId: record.job.id, variantId: variant.variantId, productId: variant.productId, expectedSku: variant.sku })) });
+    if (candidates.length) {
+      await db.generationJobItem.createMany({ data: candidates.map((variant) => {
+        const inScope = variantInScope(variant, config);
+        return {
+          jobId: record.job.id,
+          variantId: variant.variantId,
+          productId: variant.productId,
+          expectedSku: variant.sku,
+          ...(inScope ? {} : {
+            status: "skipped_conflict",
+            message: "Variant is outside the selected rule scope.",
+          }),
+        };
+      }) });
     }
-    await db.generationJob.update({ where: { id: record.job.id }, data: { totals: JSON.stringify({ planned: targets.length, applied: 0, skippedConflict: 0, errored: 0 }) } });
+    const skippedConflict = candidates.filter((variant) => !variantInScope(variant, config)).length;
+    await db.generationJob.update({ where: { id: record.job.id }, data: { totals: JSON.stringify({ planned: candidates.length, applied: 0, skippedConflict, errored: 0 }) } });
   }
   return db.generationJob.findUniqueOrThrow({ where: { id: record.job.id }, include: { items: true } });
 }
@@ -291,11 +307,20 @@ async function refreshBulkAssignments(db: PrismaClient, catalog: ShopifyCatalog,
   const current = new Map(all.map((variant) => [variant.variantId, variant]));
   const index = new DupIndex();
   index.addBatch(all.map((variant) => ({ variantId: variant.variantId, sku: variant.sku })));
+  const rule = await db.skuRuleSet.findUniqueOrThrow({ where: { id: job.ruleSetId } });
+  const config = parseRuleConfig(rule.config);
   const items = await db.generationJobItem.findMany({ where: { jobId: job.id, status: { not: "applied" } }, orderBy: { id: "asc" } });
   for (const item of items) {
     const variant = current.get(item.variantId);
     if (!variant || !item.proposedSku) {
       await db.generationJobItem.update({ where: { id: item.id }, data: { status: "error", message: "Variant or proposal is unavailable." } });
+      continue;
+    }
+    if (!variantInScope(variant, config)) {
+      await db.generationJobItem.update({
+        where: { id: item.id },
+        data: { status: "skipped_conflict", message: "Variant is outside the selected rule scope." },
+      });
       continue;
     }
     const assignment = assignUnique(item.proposedSku, index, { ownerId: item.variantId });
@@ -369,8 +394,16 @@ async function refreshCsvAssignments(db: PrismaClient, catalog: ShopifyCatalog, 
       barcode: item.proposedBarcode ?? variant.barcode ?? "",
     };
   });
+  const defaultRule = await db.skuRuleSet.findFirst({
+    where: { shopId: job.shopId, isDefault: true, active: true },
+  });
+  const defaultConfig = defaultRule ? parseRuleConfig(defaultRule.config) : null;
   const report = validateCsvImport(rows, all, {
     includeBarcodeOverwrites: (JSON.parse(job.fields) as string[]).includes("barcode_overwrite"),
+    skuPattern: defaultRule ? ruleSkuPattern(defaultRule) : undefined,
+    inScopeVariantIds: defaultConfig
+      ? new Set(all.filter((variant) => variantInScope(variant, defaultConfig)).map((variant) => variant.variantId))
+      : undefined,
   });
   for (const blocked of report.rows.filter((row) => row.verdict === "block")) {
     const details = blocked.issues.filter((entry) => entry.severity === "block").map((entry) => entry.message).join(" ");
@@ -398,20 +431,51 @@ async function planSingleAssignments(db: PrismaClient, catalog: ShopifyCatalog, 
   const parsed = parsePattern(rule.pattern);
   if (!parsed.ok) throw new Error(parsed.errors[0]!.message);
   const config = parseRuleConfig(rule.config);
-  const items = await db.generationJobItem.findMany({ where: { jobId: job.id, status: { not: "applied" } }, orderBy: { id: "asc" } });
+  const items = await db.generationJobItem.findMany({ where: { jobId: job.id, status: "planned" }, orderBy: { id: "asc" } });
   const variants = new Map((await catalog.getVariants(items.map((item) => item.variantId))).map((variant) => [variant.variantId, variant]));
-  const start = await allocateStart(db, job.shopId, rule.id, items.length, parsed.ast);
+  const eligibleItems = items.filter((item) => {
+    const variant = variants.get(item.variantId);
+    return item.proposedSku === null && variant !== undefined && variantInScope(variant, config);
+  });
+  const start = await allocateStart(db, job.shopId, rule.id, eligibleItems.length, parsed.ast);
   const reservations = new DupIndex();
-  for (const [offset, item] of items.entries()) {
+  let offset = 0;
+  for (const item of items) {
     const variant = variants.get(item.variantId);
     if (!variant) {
       await db.generationJobItem.update({ where: { id: item.id }, data: { status: "error", message: "Variant was not found." } });
       continue;
     }
+    if (!variantInScope(variant, config)) {
+      await db.generationJobItem.update({
+        where: { id: item.id },
+        data: { status: "skipped_conflict", message: "Variant is outside the selected rule scope." },
+      });
+      continue;
+    }
+    if (item.proposedSku !== null) continue;
     const base = render(parsed.ast, contextFor(variant), start + offset, config);
+    offset += 1;
     const proposedSku = await pointAssignment(catalog, base, item.variantId, reservations);
     await db.generationJobItem.update({ where: { id: item.id }, data: { proposedSku } });
   }
+}
+
+export async function prepareSingleVariantJob(
+  db: PrismaClient,
+  catalog: ShopifyCatalog,
+  jobId: string,
+) {
+  const job = await db.generationJob.findUniqueOrThrow({ where: { id: jobId } });
+  if (job.trigger !== "webhook" && job.trigger !== "fix") {
+    throw new Error("Only single-variant generation jobs can use this preview step.");
+  }
+  await planSingleAssignments(db, catalog, job);
+  await db.generationJob.update({ where: { id: job.id }, data: { status: "previewing" } });
+  return db.generationJob.findUniqueOrThrow({
+    where: { id: job.id },
+    include: { items: { orderBy: { id: "asc" } } },
+  });
 }
 
 async function runWrites(

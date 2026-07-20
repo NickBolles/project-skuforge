@@ -8,7 +8,13 @@ const LABELS: Record<string, string> = {
   missing_barcode: "Missing barcode",
 };
 
-export function FindingCard({ finding, canFix }: { finding: ParsedScanFinding; canFix: boolean }) {
+interface FindingFixPreview {
+  findingId: string;
+  jobId: string;
+  items: Array<{ variantId: string; proposedSku: string | null }>;
+}
+
+export function FindingCard({ finding, canFix, preview }: { finding: ParsedScanFinding; canFix: boolean; preview?: FindingFixPreview }) {
   const fixable = finding.kind === "duplicate" || finding.kind === "malformed";
   return (
     <article style={{ border: "1px solid #ddd", borderRadius: 8, marginBlock: 12, padding: 16 }}>
@@ -18,11 +24,22 @@ export function FindingCard({ finding, canFix }: { finding: ParsedScanFinding; c
         <li key={variant.variantId}>{variant.title || variant.variantId} — SKU: {variant.sku || "missing"}</li>
       ))}</ul>
       <div style={{ display: "flex", gap: 8 }}>
-        {fixable ? (
+        {fixable && preview ? (
+          <div>
+            <p><strong>Proposed changes</strong></p>
+            <ul>{preview.items.map((item) => <li key={item.variantId}>{item.variantId} to <code>{item.proposedSku ?? "unavailable"}</code></li>)}</ul>
+            <form method="post">
+              <input type="hidden" name="intent" value="fix" />
+              <input type="hidden" name="findingId" value={finding.id} />
+              <button type="submit">Confirm and apply</button>
+              <a href="/app/scan" style={{ marginInlineStart: 8 }}>Cancel</a>
+            </form>
+          </div>
+        ) : fixable ? (
           <form method="post">
-            <input type="hidden" name="intent" value="fix" />
+            <input type="hidden" name="intent" value="preview_fix" />
             <input type="hidden" name="findingId" value={finding.id} />
-            <button type="submit" disabled={!canFix}>{canFix ? "Fix with default rule" : "Set a default rule to fix"}</button>
+            <button type="submit" disabled={!canFix}>{canFix ? "Preview fix with default rule" : "Set a default rule to fix"}</button>
           </form>
         ) : null}
         <form method="post">

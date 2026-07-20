@@ -3,7 +3,7 @@ client_id = ""
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "read_products,write_products"
 
 [webhooks]
 api_version = "2025-10"
@@ -21,6 +21,11 @@ api_version = "2025-10"
   [[webhooks.subscriptions]]
   topics = [ "app_subscriptions/update" ]
   uri = "/webhooks/app-subscriptions-update"
+
+  # Headline Pro automation: handled by /app/routes/webhooks.products-create.ts
+  [[webhooks.subscriptions]]
+  topics = [ "products/create" ]
+  uri = "/webhooks/products-create"
 
   # Webhooks can have filters
   # Only receive webhooks for product updates with a product price >= 10.00

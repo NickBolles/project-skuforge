@@ -1,12 +1,11 @@
 import type { PrismaClient, ScanFinding as PersistedFinding } from "@prisma/client";
 import type { ShopifyCatalog } from "../adapters/shopify/catalog";
+import { parsePattern, patternToRegex } from "../core/sku";
 import { scanCatalog, type ScanSummary, type ScanVariantRef } from "../core/validate";
-import { enqueueSingleVariantJob, runGenerationJob, withCatalogBulkMutex } from "./generation.server";
-import { ensureShop } from "./rules.server";
+import { enqueueSingleVariantJob, prepareSingleVariantJob, runGenerationJob, withCatalogBulkMutex } from "./generation.server";
+import { ensureShop, parseRuleConfig } from "./rules.server";
 
 export type ScanTrigger = "manual" | "nightly" | "post_generation";
-
-export const DEFAULT_SKU_PATTERN = /^[A-Za-z0-9]+(?:[-_.][A-Za-z0-9]+)*$/;
 
 export interface ParsedScanFinding extends Omit<PersistedFinding, "variants"> {
   variants: ScanVariantRef[];
@@ -58,13 +57,25 @@ export async function runScan(options: {
   skuPattern?: RegExp;
 }) {
   const shop = await ensureShop(options.db, options.shopDomain);
+  const defaultRule = options.skuPattern
+    ? null
+    : await options.db.skuRuleSet.findFirst({
+      where: { shopId: shop.id, isDefault: true, active: true },
+      select: { pattern: true, config: true },
+    });
+  let skuPattern = options.skuPattern;
+  if (!skuPattern && defaultRule) {
+    const parsed = parsePattern(defaultRule.pattern);
+    if (!parsed.ok) throw new Error(parsed.errors[0]!.message);
+    skuPattern = patternToRegex(parsed.ast, parseRuleConfig(defaultRule.config));
+  }
   const scan = await options.db.duplicateScan.create({
     data: { shopId: shop.id, trigger: options.trigger, status: "running" },
   });
   try {
     const result = await withCatalogBulkMutex(shop.id, () =>
       scanCatalog(options.catalog.streamAllVariants({ batchSize: 250 }), {
-        skuPattern: options.skuPattern ?? DEFAULT_SKU_PATTERN,
+        skuPattern,
         includeDuplicateBarcodes: true,
       }),
     );
@@ -133,7 +144,7 @@ export async function ignoreFinding(db: PrismaClient, shopDomain: string, findin
   });
 }
 
-export async function fixFinding(options: {
+export async function previewFindingFix(options: {
   db: PrismaClient;
   catalog: ShopifyCatalog;
   shopDomain: string;
@@ -161,11 +172,24 @@ export async function fixFinding(options: {
     idempotencyKey: `fix:${finding.id}`,
     variantIds: targets.map((variant) => variant.variantId),
   });
+  return prepareSingleVariantJob(options.db, options.catalog, job.id);
+}
+
+export async function fixFinding(options: {
+  db: PrismaClient;
+  catalog: ShopifyCatalog;
+  shopDomain: string;
+  findingId: string;
+}) {
+  const job = await previewFindingFix(options);
   const run = await runGenerationJob(options.db, options.catalog, job.id, { source: "ui" });
-  await options.db.scanFinding.update({
-    where: { id: finding.id },
-    data: { resolution: "fixed", resolvedAt: new Date() },
-  });
+  const items = await options.db.generationJobItem.findMany({ where: { jobId: job.id }, select: { status: true } });
+  if (items.length > 0 && items.every((item) => item.status === "applied")) {
+    await options.db.scanFinding.updateMany({
+      where: { id: options.findingId, resolution: "open" },
+      data: { resolution: "fixed", resolvedAt: new Date() },
+    });
+  }
   return run;
 }
 

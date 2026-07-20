@@ -4,6 +4,7 @@ import { InMemoryShopifyCatalog } from "../../app/adapters/shopify/inMemoryCatal
 import { scanCatalog } from "../../app/core/validate";
 import db from "../../app/db.server";
 import { applyCsvImport, dryRunCsvImport } from "../../app/services/csv.server";
+import { createRule, parseRuleConfig } from "../../app/services/rules.server";
 
 const shopDomain = "phase9-csv.myshopify.test";
 
@@ -70,5 +71,37 @@ describe("CSV import service", () => {
       duplicateBarcodeGroups: 0,
     });
     expect(await db.duplicateScan.count({ where: { shopId: applied.job.shopId, trigger: "post_generation" } })).toBe(1);
+  });
+
+  it("uses the default rule regex and excludes out-of-scope variants from CSV apply", async () => {
+    const catalog = new InMemoryShopifyCatalog([
+      variant("v1", "OLD-1"),
+      { ...variant("v2", "OLD-2"), vendor: "Other" },
+    ]);
+    await createRule(db, shopDomain, {
+      name: "Scoped CSV rule",
+      pattern: "SKU/{vendor:3} {seq:2}",
+      config: parseRuleConfig({
+        casing: "upper",
+        stripNonAlphanumeric: true,
+        scope: { vendors: ["Acme"], productTypes: [], tags: [] },
+      }),
+      isDefault: true,
+    });
+    const csv = [
+      "variant_id,product_title,variant_title,vendor,sku,barcode",
+      "v1,,,,SKU/ACM 01,",
+      "v2,,,,GENERIC-123,",
+    ].join("\r\n");
+
+    const dryRun = await dryRunCsvImport(db, catalog, shopDomain, csv);
+    expect(dryRun.rows.find((row) => row.row.variant_id === "v1")!.issues).toEqual([]);
+    expect(dryRun.rows.find((row) => row.row.variant_id === "v2")!.issues.map((issue) => issue.code)).toEqual(
+      expect.arrayContaining(["out_of_rule_scope", "default_rule_mismatch"]),
+    );
+
+    const applied = await applyCsvImport(db, catalog, shopDomain, csv, { idempotencyKey: "csv-rule-scope" });
+    expect(applied.job.status).toBe("completed");
+    expect(catalog.snapshot().map((item) => item.sku)).toEqual(["SKU/ACM 01", "OLD-2"]);
   });
 });

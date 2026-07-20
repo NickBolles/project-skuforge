@@ -18,7 +18,7 @@ describe("scan routes", () => {
     };
     const scanHtml = renderToStaticMarkup(createElement(ScanPage, { data: { scan, defaultRule: { id: "rule-1", name: "Default" }, plan: "pro", canScan: true } as never }));
     expect(scanHtml).toContain("1 duplicate SKU groups");
-    expect(scanHtml).toContain("Fix with default rule");
+    expect(scanHtml).toContain("Preview fix with default rule");
     expect(scanHtml).toContain("Ignore");
     const dashboardHtml = renderToStaticMarkup(createElement(Dashboard, { data: { shopDomain: "shop", plan: "pro", variantCount: 3, authMode: "mock", scan: { summary: { ...scan.summary, duplicateGroups: 0 }, finishedAt } } as never }));
     expect(dashboardHtml).toContain("0 duplicate SKUs");

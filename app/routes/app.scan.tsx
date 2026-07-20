@@ -3,7 +3,7 @@ import { useActionData, useLoaderData } from "react-router";
 import { FindingCard } from "../components/FindingCard";
 import { getAppContext } from "../services/context.server";
 import { ensureShop } from "../services/rules.server";
-import { fixFinding, getLatestScan, ignoreFinding, runScan } from "../services/scan.server";
+import { fixFinding, getLatestScan, ignoreFinding, previewFindingFix, runScan } from "../services/scan.server";
 import { can, entitlementResponse, enforceEntitlement } from "../services/entitlements.server";
 import { PlanGate } from "../components/PlanGate";
 
@@ -29,8 +29,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { ok: true, message: "Finding ignored." };
     }
     if (intent === "fix") {
-      await fixFinding({ db, catalog, shopDomain: session.shop, findingId: String(form.get("findingId") ?? "") });
-      return { ok: true, message: "Finding fixed and the catalog verification scan completed." };
+      const result = await fixFinding({ db, catalog, shopDomain: session.shop, findingId: String(form.get("findingId") ?? "") });
+      return result.job.status === "completed"
+        ? { ok: true, message: "Finding fixed and the catalog verification scan completed." }
+        : { ok: false, message: "The fix did not fully apply. The finding remains open; review the job results and retry." };
+    }
+    if (intent === "preview_fix") {
+      const findingId = String(form.get("findingId") ?? "");
+      const job = await previewFindingFix({ db, catalog, shopDomain: session.shop, findingId });
+      return {
+        ok: true,
+        message: "Review the proposed SKU changes, then confirm to apply them.",
+        preview: {
+          findingId,
+          jobId: job.id,
+          items: job.items.map((item) => ({ variantId: item.variantId, proposedSku: item.proposedSku })),
+        },
+      };
     }
     await runScan({ db, catalog, shopDomain: session.shop, trigger: "manual" });
     return { ok: true, message: "Catalog scan completed." };
@@ -41,9 +56,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export function ScanPage({ data }: { data: Awaited<ReturnType<typeof loader>> }) {
+export function ScanPage({ data, actionResult }: { data: Awaited<ReturnType<typeof loader>>; actionResult?: Awaited<ReturnType<typeof action>> }) {
   const { scan, defaultRule, canScan } = data;
   const duplicateCount = scan?.summary.duplicateGroups;
+  const fixPreview = actionResult && !(actionResult instanceof Response) && "preview" in actionResult
+    ? actionResult.preview
+    : undefined;
   return (
     <s-page heading="Duplicate and malformed SKU scan">
       <s-section heading="Catalog health">
@@ -54,7 +72,7 @@ export function ScanPage({ data }: { data: Awaited<ReturnType<typeof loader>> })
         <PlanGate allowed={canScan} requiredPlan="pro"><form method="post"><button type="submit" name="intent" value="scan">Scan catalog now</button></form></PlanGate>
       </s-section>
       <s-section heading="Open findings">
-        {scan?.findings.length ? scan.findings.map((finding) => <FindingCard key={finding.id} finding={finding} canFix={canScan && Boolean(defaultRule)} />) : <p>No open findings in the latest scan.</p>}
+        {scan?.findings.length ? scan.findings.map((finding) => <FindingCard key={finding.id} finding={finding} canFix={canScan && Boolean(defaultRule)} preview={fixPreview?.findingId === finding.id ? fixPreview : undefined} />) : <p>No open findings in the latest scan.</p>}
       </s-section>
     </s-page>
   );
@@ -63,5 +81,5 @@ export function ScanPage({ data }: { data: Awaited<ReturnType<typeof loader>> })
 export default function ScanRoute() {
   const data = useLoaderData<typeof loader>();
   const result = useActionData<typeof action>();
-  return <>{result ? <p role={result.ok ? "status" : "alert"}>{result.message}</p> : null}<ScanPage data={data} /></>;
+  return <>{result ? <p role={result.ok ? "status" : "alert"}>{result.message}</p> : null}<ScanPage data={data} actionResult={result} /></>;
 }

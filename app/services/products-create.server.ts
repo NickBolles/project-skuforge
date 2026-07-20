@@ -30,7 +30,7 @@ export async function handleProductsCreate(options: {
   forceAutomation?: boolean;
   plan: BillingPlan;
 }) {
-  if (!can(options.plan, "auto_generation")) {
+  if (options.forceAutomation && !can(options.plan, "auto_generation")) {
     throw new EntitlementError("auto_generation", "Automatic generation for new products requires the pro plan. Upgrade to continue.", "pro");
   }
   const shop = await ensureShop(options.db, options.shopDomain);
@@ -43,6 +43,11 @@ export async function handleProductsCreate(options: {
       return { deduped: true, jobId: null, queued: false };
     }
     throw error;
+  }
+
+  if (!can(options.plan, "auto_generation")) {
+    await options.db.webhookEvent.update({ where: { id: options.webhookId }, data: { status: "ignored_plan" } });
+    return { deduped: false, jobId: null, queued: false, ignored: true, reason: "plan" as const };
   }
 
   const settings = JSON.parse(shop.settings) as { autoGenerateOnCreate?: boolean };

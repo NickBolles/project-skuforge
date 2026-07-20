@@ -3,7 +3,7 @@ import type { CatalogVariant } from "../../app/adapters/shopify/catalog";
 import { InMemoryShopifyCatalog } from "../../app/adapters/shopify/inMemoryCatalog";
 import db from "../../app/db.server";
 import { createRule, parseRuleConfig } from "../../app/services/rules.server";
-import { fixFinding, getLatestScan, hasNightlyScanToday, ignoreFinding, runScan, utcDayStart } from "../../app/services/scan.server";
+import { fixFinding, getLatestScan, hasNightlyScanToday, ignoreFinding, previewFindingFix, runScan, utcDayStart } from "../../app/services/scan.server";
 import { generateCatalog } from "../fixtures/gen-catalog";
 
 const shopDomain = "phase10-scan.myshopify.test";
@@ -40,17 +40,58 @@ describe("duplicate scan service", () => {
     expect((await getLatestScan(db, shopDomain))?.summary.duplicateGroups).toBe(1);
   });
 
+  it("uses the active default rule regex instead of the generic SKU shape", async () => {
+    const catalog = new InMemoryShopifyCatalog([
+      variant("v1", "SKU/ACM 01"),
+      variant("v2", "GENERIC-123"),
+    ]);
+    await createRule(db, shopDomain, {
+      name: "Slash and space rule",
+      pattern: "SKU/{vendor:3} {seq:2}",
+      config: parseRuleConfig({ casing: "upper", stripNonAlphanumeric: true }),
+      isDefault: true,
+    });
+
+    const scan = await runScan({ db, catalog, shopDomain, trigger: "manual" });
+    expect(scan.summary.malformed).toBe(1);
+    expect(scan.findings.filter((finding) => finding.kind === "malformed")).toEqual([
+      expect.objectContaining({ skuValue: "GENERIC-123" }),
+    ]);
+  });
+
   it("routes a one-click fix through generation and updates the verified hero count", async () => {
     const catalog = new InMemoryShopifyCatalog([variant("v1", "DUP"), variant("v2", "DUP"), variant("v3", "DUP")]);
     await createRule(db, shopDomain, { name: "Default", pattern: "{vendor:3}-{seq:4}", config: parseRuleConfig({}), isDefault: true });
     const scan = await runScan({ db, catalog, shopDomain, trigger: "manual" });
     const finding = scan.findings.find((entry) => entry.kind === "duplicate")!;
+    const beforePreview = catalog.snapshot();
+    const preview = await previewFindingFix({ db, catalog, shopDomain, findingId: finding.id });
+    expect(preview.status).toBe("previewing");
+    expect(preview.items.every((item) => item.proposedSku)).toBe(true);
+    expect(catalog.snapshot()).toEqual(beforePreview);
     const result = await fixFinding({ db, catalog, shopDomain, findingId: finding.id });
     expect(result.job.status).toBe("completed");
     const latest = await getLatestScan(db, shopDomain);
     expect(latest?.trigger).toBe("post_generation");
     expect(latest?.summary.duplicateGroups).toBe(0);
     expect(new Set(catalog.snapshot().map((entry) => entry.sku)).size).toBe(3);
+  });
+
+  it("keeps a finding open when any one-click fix write is skipped", async () => {
+    const catalog = new InMemoryShopifyCatalog(
+      [variant("v1", "DUP"), variant("v2", "DUP")],
+      { simulate: { conflictVariantIds: ["v2"] } },
+    );
+    await createRule(db, shopDomain, { name: "Default", pattern: "{vendor:3}-{seq:4}", config: parseRuleConfig({}), isDefault: true });
+    const scan = await runScan({ db, catalog, shopDomain, trigger: "manual" });
+    const finding = scan.findings.find((entry) => entry.kind === "duplicate")!;
+
+    const result = await fixFinding({ db, catalog, shopDomain, findingId: finding.id });
+    expect(result.job.status).toBe("completed_with_findings");
+    await expect(db.scanFinding.findUniqueOrThrow({ where: { id: finding.id } })).resolves.toMatchObject({
+      resolution: "open",
+      resolvedAt: null,
+    });
   });
 
   it("persists totals for a generated 10k catalog within the service budget", { timeout: 30_000 }, async () => {

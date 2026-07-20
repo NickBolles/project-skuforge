@@ -37,6 +37,7 @@ export type CsvIssueCode =
   | "malformed_sku"
   | "malformed_barcode"
   | "default_rule_mismatch"
+  | "out_of_rule_scope"
   | "in_file_duplicate_sku"
   | "catalog_duplicate_sku"
   | "in_file_duplicate_barcode"

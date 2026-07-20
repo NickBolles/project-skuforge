@@ -1,4 +1,3 @@
-import { parsePattern } from "../sku";
 import { evaluateBarcodeWrite, normalizeSku } from "../validate";
 import type {
   CsvImportIssue,
@@ -10,7 +9,8 @@ import type {
 
 export interface ValidateCsvImportOptions {
   includeBarcodeOverwrites?: boolean;
-  defaultRulePattern?: string;
+  skuPattern?: RegExp;
+  inScopeVariantIds?: ReadonlySet<string>;
   globalIssues?: CsvImportIssue[];
 }
 
@@ -23,22 +23,6 @@ function malformed(value: string): boolean {
     const code = character.codePointAt(0)!;
     return code <= 31 || code === 127;
   });
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-export function skuPatternForRule(pattern: string): RegExp | undefined {
-  const parsed = parsePattern(pattern);
-  if (!parsed.ok) return undefined;
-  const source = parsed.ast.nodes.map((node) => {
-    if (node.type === "literal") return escapeRegExp(node.value);
-    if (node.kind === "seq") return node.padding ? `\\d{${node.padding},}` : "\\d+";
-    if (node.limit) return `[\\p{L}\\p{N}]{1,${node.limit}}`;
-    return "[\\p{L}\\p{N}]+";
-  }).join("");
-  return new RegExp(`^${source}$`, "u");
 }
 
 function issue(code: CsvImportIssue["code"], severity: CsvImportIssue["severity"], message: string, relatedVariantIds?: string[]): CsvImportIssue {
@@ -131,15 +115,17 @@ export function validateCsvImport(
   options: ValidateCsvImportOptions = {},
 ): CsvImportReport {
   const currentById = new Map(catalog.map((variant) => [variant.variantId, variant]));
-  const defaultPattern = options.defaultRulePattern ? skuPatternForRule(options.defaultRulePattern) : undefined;
   const rows: CsvImportRowReport[] = imported.map((row, index) => {
     const current = currentById.get(row.variant_id);
     const issues: CsvImportIssue[] = [];
     if (!row.variant_id.trim()) issues.push(issue("missing_variant_id", "block", "variant_id is required."));
     else if (!current) issues.push(issue("unknown_variant_id", "block", "The variant does not exist in this catalog."));
+    else if (options.inScopeVariantIds && !options.inScopeVariantIds.has(row.variant_id)) {
+      issues.push(issue("out_of_rule_scope", "block", "The variant is outside the active default rule scope."));
+    }
     if (malformed(row.sku)) issues.push(issue("malformed_sku", "block", "SKU contains control characters or exceeds 255 characters."));
     if (malformed(row.barcode)) issues.push(issue("malformed_barcode", "block", "Barcode contains control characters or exceeds 255 characters."));
-    if (row.sku && defaultPattern && !defaultPattern.test(row.sku)) {
+    if (row.sku && options.skuPattern && !options.skuPattern.test(row.sku)) {
       issues.push(issue("default_rule_mismatch", "warning", "SKU does not match the shape of the default rule."));
     }
     if (current && evaluateBarcodeWrite(current.barcode, row.barcode) === "blocked_overwrite") {

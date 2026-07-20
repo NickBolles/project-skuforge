@@ -8,7 +8,8 @@ import {
 } from "../core/csv";
 import { listEditorPage } from "./editor.server";
 import { runGenerationJob, withCatalogBulkMutex } from "./generation.server";
-import { ensureShop } from "./rules.server";
+import { variantInScope } from "./rule-scope";
+import { ensureShop, parseRuleConfig, ruleSkuPattern } from "./rules.server";
 
 export interface CsvDryRunOptions {
   includeBarcodeOverwrites?: boolean;
@@ -35,9 +36,13 @@ export async function dryRunCsvImport(
     catalogSnapshot(catalog, shop.id),
     db.skuRuleSet.findFirst({ where: { shopId: shop.id, isDefault: true, active: true } }),
   ]);
+  const config = defaultRule ? parseRuleConfig(defaultRule.config) : null;
   return validateCsvImport(parsed.rows, catalogVariants, {
     includeBarcodeOverwrites: options.includeBarcodeOverwrites,
-    defaultRulePattern: defaultRule?.pattern,
+    skuPattern: defaultRule ? ruleSkuPattern(defaultRule) : undefined,
+    inScopeVariantIds: config
+      ? new Set(catalogVariants.filter((variant) => variantInScope(variant, config)).map((variant) => variant.variantId))
+      : undefined,
     globalIssues: parsed.issues,
   });
 }
