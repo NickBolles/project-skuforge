@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { authorizedCronRequest, handleCronScan } from "../../app/routes/api.cron.scan";
+import { authorizedCronRequest, handleCronScan } from "../../app/services/cron.server";
 import { Dashboard } from "../../app/routes/app._index";
 import { ScanPage } from "../../app/routes/app.scan";
 

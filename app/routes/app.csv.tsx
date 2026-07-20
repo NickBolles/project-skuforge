@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { useActionData, useLoaderData } from "react-router";
 import type { CsvImportReport } from "../core/csv";
@@ -34,7 +33,7 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<CsvAction
     if (form.get("intent") === "apply") {
       const result = await applyCsvImport(db, catalog, session.shop, source, {
         includeBarcodeOverwrites,
-        idempotencyKey: String(form.get("idempotencyKey") ?? randomUUID()),
+        idempotencyKey: String(form.get("idempotencyKey") ?? globalThis.crypto.randomUUID()),
       });
       return { intent: "apply", report: result.report, jobId: result.job.id, status: result.job.status };
     }

@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { code128Svg, formatInternalBarcode, INTERNAL_BARCODE_HONESTY_COPY } from "../core/barcode";
@@ -44,7 +43,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const common = {
     shopDomain: session.shop,
     trigger,
-    idempotencyKey: String(form.get("idempotencyKey") ?? randomUUID()),
+    idempotencyKey: String(form.get("idempotencyKey") ?? globalThis.crypto.randomUUID()),
     selectedVariantIds: String(form.get("variantIds") ?? "").split(",").map((value) => value.trim()).filter(Boolean),
   } as const;
   const job = form.get("field") === "barcode"
