@@ -1,0 +1,11 @@
+{
+  "data": {
+    "currentBulkOperation": {
+      "id": "gid://shopify/BulkOperation/1",
+      "status": "FAILED",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "url": null,
+      "objectCount": "0"
+    }
+  }
+}

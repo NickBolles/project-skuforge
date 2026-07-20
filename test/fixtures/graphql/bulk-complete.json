@@ -1,0 +1,11 @@
+{
+  "data": {
+    "currentBulkOperation": {
+      "id": "gid://shopify/BulkOperation/1",
+      "status": "COMPLETED",
+      "errorCode": null,
+      "url": "https://fixtures.test/bulk-1.jsonl",
+      "objectCount": "8"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "currentBulkOperation": {
+      "id": "gid://shopify/BulkOperation/1",
+      "status": "RUNNING",
+      "errorCode": null,
+      "url": null,
+      "objectCount": "0"
+    }
+  }
+}

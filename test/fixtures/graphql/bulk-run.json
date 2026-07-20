@@ -1,0 +1,11 @@
+{
+  "data": {
+    "bulkOperationRunQuery": {
+      "bulkOperation": {
+        "id": "gid://shopify/BulkOperation/1",
+        "status": "CREATED"
+      },
+      "userErrors": []
+    }
+  }
+}

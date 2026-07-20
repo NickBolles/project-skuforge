@@ -20,6 +20,8 @@ export interface VariantWrite {
   barcode?: string;
   expectedSku?: string | null;
   expectedBarcode?: string | null;
+  /** Requires explicit UI/import consent; false keeps non-empty merchant barcodes intact. */
+  allowBarcodeOverwrite?: boolean;
 }
 
 export interface WriteResult {
@@ -34,18 +36,39 @@ export interface VariantPage {
   hasNext: boolean;
 }
 
+export interface VariantFilter {
+  text?: string;
+  vendor?: string;
+  productType?: string;
+  missingSku?: boolean;
+  missingBarcode?: boolean;
+}
+
+export type CatalogErrorCode =
+  | "BULK_OP_ALREADY_RUNNING"
+  | "BULK_OP_FAILED"
+  | "BULK_OP_TIMEOUT"
+  | "INVALID_CURSOR"
+  | "GRAPHQL_ERROR";
+
+export class CatalogError extends Error {
+  readonly code: CatalogErrorCode;
+
+  constructor(code: CatalogErrorCode, message: string) {
+    super(message);
+    this.name = "CatalogError";
+    this.code = code;
+  }
+}
+
 export interface ShopifyCatalog {
-  streamAllVariants(opts?: { batchSize?: number }): AsyncIterable<CatalogVariant[]>;
+  streamAllVariants(opts?: {
+    batchSize?: number;
+  }): AsyncIterable<CatalogVariant[]>;
   listVariantsPage(opts: {
     cursor?: string;
     pageSize: number;
-    filter?: {
-      text?: string;
-      vendor?: string;
-      productType?: string;
-      missingSku?: boolean;
-      missingBarcode?: boolean;
-    };
+    filter?: VariantFilter;
   }): Promise<VariantPage>;
   findVariantsBySku(
     values: string[],

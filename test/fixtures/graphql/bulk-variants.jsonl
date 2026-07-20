@@ -1,0 +1,8 @@
+{"id":"gid://shopify/ProductVariant/1","__parentId":"gid://shopify/Product/1","title":"Red / S","sku":"SKU-A","barcode":null,"price":"10.00","updatedAt":"2026-01-01T00:00:01.000Z","selectedOptions":[{"name":"Color","value":"Red"},{"name":"Size","value":"S"}]}
+{"id":"gid://shopify/Product/1","title":"Alpha Shirt","vendor":"Acme","productType":"Shirt","tags":["retail","alpha"],"status":"ACTIVE","updatedAt":"2026-01-01T00:00:01.000Z"}
+{"id":"gid://shopify/ProductVariant/2","__parentId":"gid://shopify/Product/1","title":"Blue / M","sku":" sku-b ","barcode":"200","price":"11.00","updatedAt":"2026-01-01T00:00:02.000Z","selectedOptions":[{"name":"Color","value":"Blue"},{"name":"Size","value":"M"}]}
+{"id":"gid://shopify/Product/2","title":"Beta Mug","vendor":"Orbit","productType":"Mug","tags":["retail","beta"],"status":"ACTIVE","updatedAt":"2026-01-01T00:00:03.000Z"}
+{"id":"gid://shopify/ProductVariant/3","__parentId":"gid://shopify/Product/2","title":"Default","sku":"SKU-B","barcode":"300","price":"12.00","updatedAt":"2026-01-01T00:00:03.000Z","selectedOptions":[{"name":"Title","value":"Default"}]}
+{"id":"gid://shopify/ProductVariant/4","__parentId":"gid://shopify/Product/2","title":"Gift","sku":null,"barcode":null,"price":"13.00","updatedAt":"2026-01-01T00:00:04.000Z","selectedOptions":[{"name":"Title","value":"Gift"}]}
+{"id":"gid://shopify/Product/3","title":"Special Hat","vendor":"Juniper","productType":"Hat","tags":["special"],"status":"DRAFT","updatedAt":"2026-01-01T00:00:05.000Z"}
+{"id":"gid://shopify/ProductVariant/5","__parentId":"gid://shopify/Product/3","title":"Black","sku":"SKU-E","barcode":"500","price":"14.00","updatedAt":"2026-01-01T00:00:05.000Z","selectedOptions":[{"name":"Color","value":"Black"}]}

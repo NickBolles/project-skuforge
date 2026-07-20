@@ -1,0 +1,13 @@
+{
+  "data": {
+    "productVariantsBulkUpdate": {
+      "productVariants": [],
+      "userErrors": [
+        {
+          "field": ["variants", "0", "sku"],
+          "message": "SKU was rejected by Shopify."
+        }
+      ]
+    }
+  }
+}
