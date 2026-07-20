@@ -22,6 +22,8 @@ export default function Index() {
         <p>Shop: {data.shopDomain}</p>
         <p>Plan: {data.plan}</p>
         <p>Catalog variants: {data.variantCount}</p>
+        <p><a href="/app/rules">Manage SKU rules</a></p>
+        <p><a href="/app/generate">Generate missing SKUs</a></p>
       </section>
     );
   }
@@ -32,6 +34,8 @@ export default function Index() {
         <s-paragraph>Shop: {data.shopDomain}</s-paragraph>
         <s-paragraph>Plan: {data.plan}</s-paragraph>
         <s-paragraph>Catalog variants: {data.variantCount}</s-paragraph>
+        <s-link href="/app/rules">Manage SKU rules</s-link>
+        <s-link href="/app/generate">Generate missing SKUs</s-link>
       </s-section>
     </s-page>
   );

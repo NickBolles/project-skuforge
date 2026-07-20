@@ -3,6 +3,7 @@ import { FakeBillingGateway } from "../adapters/billing/gateway";
 import type { BillingGateway } from "../adapters/billing/gateway";
 import type { CatalogVariant, ShopifyCatalog } from "../adapters/shopify/catalog";
 import { FixtureCatalog } from "../adapters/shopify/fixture-catalog.server";
+import { GraphqlShopifyCatalog } from "../adapters/shopify/graphqlCatalog";
 import { parseEnv } from "../config/env.server";
 import db from "../db.server";
 import { authenticate, MOCK_SHOP_DOMAIN } from "../shopify.server";
@@ -23,6 +24,13 @@ export interface AppContext {
   authMode: "shopify" | "mock";
 }
 
+let mockCatalog: FixtureCatalog | undefined;
+
+export function getMockCatalog(): FixtureCatalog {
+  mockCatalog ??= new FixtureCatalog(smallCatalog as CatalogVariant[]);
+  return mockCatalog;
+}
+
 export async function getAppContext(
   request: Request,
   source: NodeJS.ProcessEnv = process.env,
@@ -39,7 +47,7 @@ export async function getAppContext(
     };
     return {
       session,
-      catalog: new FixtureCatalog(smallCatalog as CatalogVariant[]),
+      catalog: getMockCatalog(),
       billing: new FakeBillingGateway(env.MOCK_PLAN),
       db,
       authMode: "mock",
@@ -47,7 +55,11 @@ export async function getAppContext(
   }
 
   const { session } = await authenticate.admin(request);
-  throw new Error(
-    `Authenticated ${session.shop}, but the live ShopifyCatalog adapter is introduced in Phase 3.`,
-  );
+  return {
+    session: session as AppSession,
+    catalog: new GraphqlShopifyCatalog(session.shop, session.accessToken!),
+    billing: new FakeBillingGateway(env.MOCK_PLAN),
+    db,
+    authMode: "shopify",
+  };
 }
