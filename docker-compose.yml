@@ -26,6 +26,12 @@ services:
       - .env
     environment:
       DATABASE_URL: ${DATABASE_URL:?Set a URL-encoded DATABASE_URL in the VPS .env file}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
     networks:
       - default
       - traefik
