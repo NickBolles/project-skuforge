@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loader } from "./healthz";
+import { loader } from "../app/routes/healthz";
 
 describe("healthz route", () => {
   it("reports process liveness without depending on application services", async () => {
