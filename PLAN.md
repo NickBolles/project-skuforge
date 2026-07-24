@@ -30,5 +30,11 @@ This one can lean hardest on app-store SEO — "SKU generator," "barcode generat
 ### Risks
 The 2022-era gap may have been partially filled — **week-0 task: install and audit the top 5 current "SKU generator" apps** (2 evenings); if one now does auto-fill-both + duplicate validation well, differentiate on label printing + validation UX or deprioritize this spec. Bulk-API edge cases (variants created mid-scan) need careful idempotency.
 
+### Brand and domain direction (2026-07-24)
+**Recommendation: retain SKUForge.** It is a clear, extensible fit for SKU generation, validation, and label workflows. `skuforge.com` is registered; `getskuforge.com` appeared unregistered in a live RDAP lookup on 2026-07-24. Backup directions: SKU Stencil (`skustencil.com`) and Barcode Loom (`barcodeloom.com`) appeared unregistered in the same lookup. Confirm availability at registrar checkout and complete trademark/legal clearance before purchase or launch.
+
+### Hosted deployment progress (2026-07-24)
+The VPS release is live at immutable SHA `e08a735872d7d5e99eb0afd045ac1834b7989ddf`. Database and web containers are healthy; Traefik and public HTTPS `/healthz` are verified. Before a real merchant launch, complete the existing competitor-audit gate, then validate a Shopify development-store install, catalog scan, controlled SKU/barcode generation, signed webhooks, test billing, label printing/scanning, and nightly cron idempotency.
+
 ---
 
