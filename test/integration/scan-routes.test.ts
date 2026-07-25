@@ -20,7 +20,12 @@ describe("scan routes", () => {
     expect(scanHtml).toContain("1 duplicate SKU groups");
     expect(scanHtml).toContain("Preview fix with default rule");
     expect(scanHtml).toContain("Ignore");
-    const dashboardHtml = renderToStaticMarkup(createElement(Dashboard, { data: { shopDomain: "shop", plan: "pro", variantCount: 3, authMode: "mock", scan: { summary: { ...scan.summary, duplicateGroups: 0 }, finishedAt } } as never }));
+    const dashboardHtml = renderToStaticMarkup(createElement(Dashboard, { data: {
+      shopDomain: "shop", plan: "pro", variantCount: 3, authMode: "mock",
+      hasDefaultRule: true,
+      features: { scan: true, labels: false, csv: false },
+      scan: { summary: { ...scan.summary, duplicateGroups: 0 }, finishedAt },
+    } }));
     expect(dashboardHtml).toContain("0 duplicate SKUs");
   });
 
