@@ -1,5 +1,8 @@
 # @shopify/shopify-app-template-react-router
 
+## 2026.07.25
+- [#16](https://github.com/NickBolles/project-skuforge/pull/16) Rebuild the main page as a guided dashboard: catalog health hero, recommended-next-step banner, setup checklist, stat tiles, and plan-badged quick actions; add the user story and UX spec in `docs/UX_MAIN_PAGE.md`.
+
 ## 2026.01.08
 - [#170](https://github.com/Shopify/shopify-app-template-react-router/pull/170) - Update React Router minimum version to v7.12.0
 
