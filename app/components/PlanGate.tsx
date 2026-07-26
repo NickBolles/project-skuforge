@@ -6,7 +6,7 @@ export function PlanGate({ allowed, requiredPlan, children }: { allowed: boolean
   return (
     <section role="note" style={{ border: "1px solid #d6b656", borderRadius: 8, padding: 16 }}>
       <p>This action requires the {requiredPlan} plan.</p>
-      <a href="/app/billing">View plans and upgrade</a>
+      <s-link href="/app/billing">View plans and upgrade</s-link>
     </section>
   );
 }

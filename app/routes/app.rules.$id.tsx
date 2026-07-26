@@ -73,7 +73,7 @@ export function RuleEditorPage({ initial, preview, onPreview, error, patternErro
 
   return (
     <s-page heading={`Edit rule: ${value.name}`}>
-      <p><a href="/app/rules">← All rules</a></p>
+      <p><s-link href="/app/rules">← All rules</s-link></p>
       {error ? <p role="alert" style={{ color: "#b42318" }}>{error}</p> : null}
       {saved ? <p role="status">Rule saved.</p> : null}
       <form method="post">

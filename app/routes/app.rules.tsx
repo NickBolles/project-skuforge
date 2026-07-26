@@ -50,7 +50,7 @@ export function RulesPage({ rules }: RulesPageProps) {
       </s-section>
       <s-section heading="Saved rules">
         {rules.length === 0 ? <p>No rules yet.</p> : (
-          <ul>{rules.map((rule) => <li key={rule.id}><a href={`/app/rules/${rule.id}`}>{rule.name}</a> — <code>{rule.pattern}</code>{rule.isDefault ? " — Default" : ""}{!rule.active ? " — Inactive" : ""}</li>)}</ul>
+          <ul>{rules.map((rule) => <li key={rule.id}><s-link href={`/app/rules/${rule.id}`}>{rule.name}</s-link> — <code>{rule.pattern}</code>{rule.isDefault ? " — Default" : ""}{!rule.active ? " — Inactive" : ""}</li>)}</ul>
         )}
       </s-section>
     </s-page>

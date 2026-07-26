@@ -73,16 +73,16 @@ export function EditorPage({ data, actionResult }: { data: Awaited<ReturnType<ty
           <button type="submit">Apply filters</button>
         </form>
         <p>{data.totalVariants.toLocaleString()} catalog variants · {data.plan} plan. Free-plan awareness is informational in this phase.</p>
-        <p><a href={`/api/csv/export?${new URLSearchParams(data.filters).toString()}`}>Export this filtered view as CSV</a> · <a href="/app/csv">Import CSV</a></p>
+        <p><a href={`/api/csv/export?${new URLSearchParams(data.filters).toString()}`}>Export this filtered view as CSV</a> · <s-link href="/app/csv">Import CSV</s-link></p>
         {truthy(data.filters.duplicates ?? null) ? (
           data.duplicateScan
-            ? <p>Duplicate results from {data.duplicateScan.finishedAt?.toISOString() ?? "the latest completed scan"}. <a href="/app/scan">Run a fresh scan</a>.</p>
-            : <p>No completed duplicate scan is available. <a href="/app/scan">Run a scan</a>.</p>
+            ? <p>Duplicate results from {data.duplicateScan.finishedAt?.toISOString() ?? "the latest completed scan"}. <s-link href="/app/scan">Run a fresh scan</s-link>.</p>
+            : <p>No completed duplicate scan is available. <s-link href="/app/scan">Run a scan</s-link>.</p>
         ) : null}
       </s-section>
       <s-section heading="Variants">
         <VariantGrid variants={data.variants} rules={data.rules} actionResult={actionResult} />
-        {data.hasNext && data.cursor ? <a href={nextHref(data.filters, data.cursor)}>Next page</a> : null}
+        {data.hasNext && data.cursor ? <s-link href={nextHref(data.filters, data.cursor)}>Next page</s-link> : null}
       </s-section>
     </s-page>
   );
