@@ -32,7 +32,7 @@ export function FindingCard({ finding, canFix, preview }: { finding: ParsedScanF
               <input type="hidden" name="intent" value="fix" />
               <input type="hidden" name="findingId" value={finding.id} />
               <button type="submit">Confirm and apply</button>
-              <span style={{ marginInlineStart: 8 }}><s-link href="/app/scan">Cancel</s-link></span>
+              {" "}<s-link href="/app/scan">Cancel</s-link>
             </form>
           </div>
         ) : fixable ? (

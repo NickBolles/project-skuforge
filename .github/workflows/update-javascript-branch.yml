@@ -62,11 +62,11 @@ jobs:
           find . \( -name ".graphqlrc.ts" -o -name "tsconfig.js.json" -o -name "vite.config.ts" -o -name "env.d.ts" \) -delete
 
       - name: Run prettier
-        run: pnpm prettier -w "app/**/*.{js,jsx}" ".graphqlrc.js" "vite.config.js"
+        run: pnpm prettier -w "app/**/*.{js,jsx}" ".graphqlrc.js" "vite.config.mjs"
 
       - name: Run ESLint
         run: |
-          pnpm eslint "app/**/*.{js,jsx}" ".graphqlrc.js" "vite.config.js" --fix --no-cache --ignore-pattern "\!.graphqlrc.js" --plugin @shopify/eslint-plugin --rule '{
+          pnpm eslint "app/**/*.{js,jsx}" ".graphqlrc.js" "vite.config.mjs" --fix --no-cache --ignore-pattern "\!.graphqlrc.js" --plugin @shopify/eslint-plugin --rule '{
             "import/order": "error",
             "import/newline-after-import": "error",
             "padding-line-between-statements": ["error",
