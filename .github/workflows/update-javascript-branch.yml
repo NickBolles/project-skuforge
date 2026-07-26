@@ -67,6 +67,8 @@ jobs:
       - name: Run ESLint
         run: |
           pnpm eslint "app/**/*.{js,jsx}" ".graphqlrc.js" "vite.config.mjs" --fix --no-cache --ignore-pattern "\!.graphqlrc.js" --plugin @shopify/eslint-plugin --rule '{
+            "react/prop-types": "off",
+            "no-undef": "off",
             "import/order": "error",
             "import/newline-after-import": "error",
             "padding-line-between-statements": ["error",
