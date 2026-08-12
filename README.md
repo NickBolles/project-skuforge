@@ -19,6 +19,7 @@ Run `npm run check` for schema drift, typecheck, lint, tests, and the production
 
 ## Operations and architecture
 
+- [Launch plan](./docs/LAUNCH_PLAN.md) — current status, blockers, and the path to the App Store
 - [Implementation plan](./IMPLEMENTATION_PLAN.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Nightly cron](./docs/CRON.md)
