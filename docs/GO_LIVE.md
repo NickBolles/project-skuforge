@@ -42,6 +42,26 @@ Do not deploy until a human completes the week-0 competitor audit required by `P
 5. Confirm automation is Pro-only, labels and CSV are Premium-only, and a 51-variant Free store receives a clear 403 upgrade reason.
 6. Print one Avery and one thermal PDF at actual size; confirm geometry and barcode readability. Confirm the UI does not imply internal Code 128 values are GS1 UPC/EAN identifiers.
 
+## 4a. Run exactly one web instance
+
+SKUForge must run as a **single web instance**. The per-shop `JobLock` that
+guarantees SKU uniqueness is database-backed and safe across processes, but two
+other mechanisms live in process memory:
+
+- the **catalog bulk-operation mutex** (`withCatalogBulkMutex`) — two instances
+  can start concurrent Shopify bulk operations, and the real API rejects the
+  second with `BULK_OP_ALREADY_RUNNING`, failing a scan or a plan step;
+- the **pending webhook-job drain**, which is queued in memory.
+
+Do not scale the `web` service beyond one replica, and do not add a second host
+behind the load balancer, until both are moved to the database. The production
+`docker-compose.yml` runs one replica by design.
+
+Stranded webhook jobs are recovered by the nightly cron
+(`runNightlyScans` drains `pending` webhook jobs for every installed shop before
+scanning, and reports the count as `drainedWebhookJobs`), so a crash no longer
+leaves them parked indefinitely.
+
 ## 5. Nightly scheduler and listing
 
 1. Choose Fly cron, GitHub Actions, Supabase scheduled functions, or an equivalent HTTPS scheduler.

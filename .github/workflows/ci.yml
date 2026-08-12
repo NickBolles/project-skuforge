@@ -16,6 +16,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check Prisma schema sync
+        run: npm run check:schema
+
       - name: Run TypeScript type checking
         run: npx tsc --noEmit
 
@@ -24,6 +27,14 @@ jobs:
 
       - name: Validate Prisma
         run: npx prisma generate && npx prisma validate
+
+      # The suite runs against prisma/dev.sqlite, which is gitignored, so the
+      # migrations have to be applied before the tests can run.
+      - name: Apply SQLite migrations
+        run: npx prisma migrate deploy
+
+      - name: Run tests
+        run: npm run test
 
       - name: Build application
         run: npm run build

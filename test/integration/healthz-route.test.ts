@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-const queryRawUnsafe = vi.fn();
+// vi.hoisted keeps the spy above the hoisted vi.mock factory. A plain top-level
+// `const` is initialized after the factory runs, which throws a TDZ error and
+// makes the whole file fail to load (silently: it contributes zero tests).
+const { queryRawUnsafe } = vi.hoisted(() => ({ queryRawUnsafe: vi.fn() }));
 
 vi.mock("../../app/db.server", () => ({
   default: { $queryRawUnsafe: queryRawUnsafe },

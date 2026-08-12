@@ -1,49 +1,65 @@
 # This file stores configurations for your Shopify app.
-client_id = ""
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration
+#
+# Reconciled 2026-08-12 against the Partner Dashboard via `shopify app config link`.
+# The identity fields below are authoritative — do not hand-edit them; re-link instead.
+
+client_id = "69080614dfec9869ce89fd6ccfec6776"
+name = "SKUForge"
+application_url = "https://skuforge.srv1073822.hstgr.cloud"
+embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+# Shopify implies read_products from write_products, so an installed shop reports
+# the granted scope as "write_products" alone. That is expected, not a defect.
 scopes = "read_products,write_products"
+optional_scopes = [ ]
+use_legacy_install_flow = false
 
 [webhooks]
+# Pinned to 2025-10 to match the Admin API version the app calls with
+# (`ApiVersion.October25` in app/shopify.server.ts, and the default in
+# app/adapters/shopify/graphqlCatalog.ts) and the recorded GraphQL fixtures the
+# adapter contract suite validates against.
+#
+# ⚠️ 2025-10 leaves Shopify's supported window around October 2026. Bumping to
+# 2026-07 requires re-recording the adapter fixtures and re-running the contract
+# suite — see docs/LAUNCH_PLAN.md. Do not bump this line on its own.
 api_version = "2025-10"
 
   # Handled by: /app/routes/webhooks.app.uninstalled.tsx
   [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"
-  topics = ["app/uninstalled"]
+  topics = [ "app/uninstalled" ]
 
   # Handled by: /app/routes/webhooks.app.scopes_update.tsx
   [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
 
+  # Drives billing entitlement changes: /app/routes/webhooks.app-subscriptions-update.ts
   [[webhooks.subscriptions]]
-  topics = [ "app_subscriptions/update" ]
   uri = "/webhooks/app-subscriptions-update"
+  topics = [ "app_subscriptions/update" ]
 
   # Headline Pro automation: handled by /app/routes/webhooks.products-create.ts
   [[webhooks.subscriptions]]
-  topics = [ "products/create" ]
   uri = "/webhooks/products-create"
-
-  # Webhooks can have filters
-  # Only receive webhooks for product updates with a product price >= 10.00
-  # See: https://shopify.dev/docs/apps/build/webhooks/customize/filters
-  # [[webhooks.subscriptions]]
-  # topics = ["products/update"]
-  # uri = "/webhooks/products/update"
-  # filter = "variants.price:>=10.00"
+  topics = [ "products/create" ]
 
   # Mandatory privacy-law compliance topics for public apps.
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers-data-request"
-  compliance_topics = ["customers/data_request"]
+  compliance_topics = [ "customers/data_request" ]
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers-redact"
-  compliance_topics = ["customers/redact"]
+  compliance_topics = [ "customers/redact" ]
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/shop-redact"
-  compliance_topics = ["shop/redact"]
+  compliance_topics = [ "shop/redact" ]
+
+[auth]
+redirect_urls = [ "https://skuforge.srv1073822.hstgr.cloud/auth/callback" ]
