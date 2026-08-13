@@ -115,7 +115,32 @@ For each app in the Partner Dashboard: set **App URL** = `https://<sub>.nickboll
 `POST /internal/cron/dispatch` & `/internal/cron/escalate` (every min), `/internal/cron/reconcile` (15 min), `/internal/cron/digest` (hourly), `/internal/cron/prune` (daily) — all with `Authorization: Bearer $CRON_SECRET`.
 
 ### 5c. Billing
-All three use **Shopify-managed App Pricing** (configure Free/paid tiers in the Partner Dashboard — do NOT add legacy recurring charges). Test with a dev-store test-mode upgrade; confirm the `app_subscriptions/update` webhook flips entitlements and cancellation downgrades. (AlertProof: $9/$19; SKUForge: $12/$19; CheckoutWatch: $19/$49.)
+
+> **⚠️ Corrected 2026-08-13 for SKUForge.** This section originally said all three apps use
+> **Shopify-managed App Pricing** and to *not* add recurring charges. **That is not what SKUForge
+> does, and the decision is now settled the other way: SKUForge uses the Billing API via
+> `appSubscriptionCreate`** (`app/adapters/billing/shopifyBilling.ts`), with prices defined in code
+> at `PLAN_PRICES` in `app/core/constants.ts`.
+>
+> The two models are mutually exclusive in practice — configuring managed pricing in the Partner
+> Dashboard *and* creating app subscriptions in code results in a merchant being charged twice.
+> **For SKUForge, do not configure managed pricing in the Partner Dashboard.** Enter the plan
+> names and prices on the listing for display only.
+>
+> The rest of this section still applies unchanged, and AlertProof/CheckoutWatch are unaffected —
+> verify their model separately before assuming it matches.
+
+Test with a dev-store test-mode upgrade; confirm the `app_subscriptions/update` webhook flips entitlements and cancellation downgrades. (AlertProof: $9/$19; SKUForge: $12/$19; CheckoutWatch: $19/$49.)
+
+For SKUForge the test-mode flag is `BILLING_TEST` in `/etc/vps-apps/skuforge.env`, which feeds
+`test:` on the `appSubscriptionCreate` mutation. It is **`false`** as of 2026-08-13 (the correct
+production value). Development stores only accept test charges, so **flip it back to `true` for the
+duration of the dev-store billing walkthrough**, then return it to `false`:
+
+```bash
+sudo sed -i 's/^BILLING_TEST=.*/BILLING_TEST=true/' /etc/vps-apps/skuforge.env
+cd /opt/vps-apps/project-skuforge && docker compose -p skuforge up -d web
+```
 
 ---
 

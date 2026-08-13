@@ -1,12 +1,19 @@
 # SKUForge — Launch Plan
 
-**Last updated:** 2026-08-13 (third pass, after execution)
-**Audited against:** `main` @ `0f974e0`, live VPS deployment, live production database,
-and the Partner Dashboard config pulled via `shopify app config link`.
+**Last updated:** 2026-08-13 (fourth pass, after execution)
+**Audited against:** `main` @ `0f974e0` plus the `chore/launch-config-cron-seqbump` branch, live VPS
+deployment, and the Partner Dashboard config pulled via `shopify app config link`.
 
 **Third pass summary:** added the missing `[build]` block to `shopify.app.toml` (BLOCKER-A now does
 what it says), version-controlled the VPS cron under `ops/cron/`, fixed MINOR-3, and re-audited
-MINOR-2 as stale. The five human blockers below (B–H) are unchanged and still gate submission.
+MINOR-2 as stale.
+
+**Fourth pass summary:** published `/terms`, stood up **encrypted nightly database backups**
+(there were none — the only copy of production data was the live Docker volume), set
+`BILLING_TEST=false` and deduplicated the production env file, and **settled the billing-model
+contradiction in favour of `appSubscriptionCreate`** (BLOCKER-F item 2 closed). One new and
+serious finding: **the `client_id` in `shopify.app.toml` does not match the `SHOPIFY_API_KEY` the
+production app is running with** — see BLOCKER-0, which now gates BLOCKER-A.
 **Target:** Shopify App Store listing.
 
 `docs/GO_LIVE.md` remains authoritative for env-var names and webhook paths.
@@ -44,6 +51,18 @@ See §7 for corrections to `DEPLOYMENT_HANDOFF.md`.
 | **Single-instance constraint documented** | `docs/GO_LIVE.md` §4a. |
 | **Deployed** | `a5dc4c7` live. `/healthz`, `/`, `/privacy`, `/support` all 200; `/api/cron/scan` still 401s unauthenticated. |
 
+### ✅ Completed in the fourth pass (2026-08-13)
+
+| Item | What was done |
+|---|---|
+| **Terms of service published** | `/terms` — new. Covers plans and billing (the real `appSubscriptionCreate` model, both prices read from `PLAN_PRICES`), the GS1-vs-internal-barcode disclaimer as a *legal* limit rather than just an FAQ answer, catalog-write responsibility, warranty disclaimer, liability cap, and termination. Linked from the masthead and footer of every public page. **Live only after this branch deploys.** |
+| **Encrypted nightly DB backups** | **There were none.** The only copy of production data was the live `skuforge-postgres` Docker volume. Now: `pg_dump` → `gzip -9` → AES-256-CBC/PBKDF2-200k nightly at 03:37 UTC, 14-day retention, version-controlled in `ops/backup/`, documented in `docs/BACKUPS.md`. Mirrors the AlertProof backup already on the host, so one restore procedure covers both. |
+| **Backup verified end to end** | Not just written — the first run was decrypted, gunzipped, and confirmed to contain all 12 tables with their `COPY` data blocks. An untested backup is not a backup. |
+| **`BILLING_TEST=false`** | Set in `/etc/vps-apps/skuforge.env` and confirmed inside the running container. See BLOCKER-F for the sequencing consequence. |
+| **Production env file deduplicated** | Every key appeared **twice** — the example template header sat above the real values. Compose and the cron script both take the last occurrence, so the placeholders were inert, but the shadowed `TRAEFIK_CERTRESOLVER=letsencrypt` (real value: `mytlschallenge`) would have broken TLS the moment anything reordered the file. Backed up to `skuforge.env.bak-20260813-181936` first. |
+| **Billing model decided** | `appSubscriptionCreate`, not Shopify-managed pricing. `DEPLOYMENT_HANDOFF.md` §5c corrected in place. |
+| **Stale CRLF claim corrected** | The env file is LF-clean today, not CRLF as `docs/CRON.md` asserted. The `tr -d '\r'` guard stays anyway — the claim was wrong, the defence is still worth keeping. |
+
 ### ⚠️ Correction to the first pass
 
 **The first version of this document claimed no webhooks were registered. That was wrong.**
@@ -65,6 +84,52 @@ gap in testing, not evidence of breakage.
 ---
 
 ## 2. Remaining blockers
+
+### 🚨 BLOCKER-0 — `client_id` and `SHOPIFY_API_KEY` name two different apps (needs you, do this first)
+
+**Found 2026-08-13. This gates BLOCKER-A and must be resolved before `shopify app deploy` is run.**
+
+| Where | Value |
+|---|---|
+| `shopify.app.toml` → `client_id` | `69080614dfec9869ce89fd6ccfec6776` |
+| `/etc/vps-apps/skuforge.env` → `SHOPIFY_API_KEY` (and the live container) | `0ddd7fb0144d129658cd19834ab6b5de` |
+
+A Shopify app's `client_id` **is** its API key. Two different values mean the repo config and the
+running production app are pointed at **two different Partner Dashboard apps**.
+
+Why this is dangerous rather than cosmetic: `shopify app deploy` writes to whichever app
+`client_id` names. If `6908…` is the wrong one, that command pushes the scopes, `[auth]` block,
+and all seven webhook subscriptions to an app **no merchant is installed on**, while the app that
+is actually serving traffic keeps its old config — and the deploy reports success. That is
+precisely the silent no-op the `[build]` fix in the third pass was meant to eliminate, arriving by
+a different route.
+
+**What we know:** the running container authenticates as `0ddd7fb0…`, and the `skuforge-lab`
+install works against it — OAuth would fail outright otherwise. That is real evidence that
+`0ddd7fb0…` is the live app. The counter-evidence is that the third pass ran
+`shopify app config link` and the Dashboard app it linked to already declared all seven webhook
+topics pointing at the correct production URLs. Both cannot be the same app.
+
+The most likely explanation is that two apps were created during setup, the deployment was wired
+to the first, and `config link` later picked the second from the list.
+
+**How to resolve (5 minutes, Partner Dashboard):**
+
+1. Open the Partner Dashboard app list. Expect to find **two** SKUForge-ish apps.
+2. Identify which one `skuforge-lab.myshopify.com` is actually installed on. That one is
+   authoritative — it holds the merchant install and the OAuth grant.
+3. If the live app is `0ddd7fb0…` (most likely): change `client_id` in `shopify.app.toml` to
+   `0ddd7fb0144d129658cd19834ab6b5de`, re-run `shopify app config link` against it to confirm the
+   rest of the file matches, and **delete the unused app** so this cannot recur.
+4. If the live app is genuinely `6908…`: update `SHOPIFY_API_KEY` **and** `SHOPIFY_API_SECRET` in
+   `/etc/vps-apps/skuforge.env` together — they are a pair, and changing one alone breaks both
+   OAuth and webhook HMAC verification. Every existing install must then re-authorize.
+
+Do not guess. Confirm against the Dashboard before touching either value.
+
+> Note: I could not settle this from the VPS. Reading the production `Shop`/`Session` tables would
+> have identified the owning app directly, but those queries were blocked by this environment's
+> permission policy. Everything else in this pass was verified against the live host.
 
 ### 🔴 BLOCKER-A — `shopify app deploy` (needs you)
 
@@ -121,12 +186,18 @@ Shopify requires a working support contact, and reviewers do test it. Set `SUPPO
 `LEGAL_ENTITY`, currently just "SKUForge") to real values — it is a one-line change in that file,
 and nothing else hardcodes them.
 
+**Added in the fourth pass:** `GOVERNING_LAW` in the same file is also a placeholder
+(`"the State of Delaware, United States"`) and is named in §12 of the new `/terms` page. Set it to
+the jurisdiction `LEGAL_ENTITY` is actually organized in. All three placeholders are flagged with
+`⚠️` comments in `app/config/brand.ts`; nothing else in the codebase hardcodes them.
+
 ### 🔴 BLOCKER-D — Listing assets (needs you)
 
 | Asset | Status |
 |---|---|
 | Privacy policy URL | ✅ `https://skuforge.srv1073822.hstgr.cloud/privacy` |
 | Support URL | ✅ `https://skuforge.srv1073822.hstgr.cloud/support` |
+| Terms of service URL | ⚠️ `https://skuforge.srv1073822.hstgr.cloud/terms` — written, live once this branch deploys. Set `GOVERNING_LAW` in `app/config/brand.ts` first (placeholder, see BLOCKER-C). |
 | Support email | ❌ Placeholder — BLOCKER-C |
 | App icon (1200×1200, no text) | ❌ Missing |
 | Screenshots (≥3, 1600×900) | ❌ Missing — the guided dashboard, scan screen, and a label PDF are the natural three |
@@ -140,17 +211,34 @@ confirm this is the app you want listed first.
 
 ### 🔴 BLOCKER-F — Billing never exercised (needs you)
 
-`BILLING_TEST=true` is set in production right now, and no subscription has ever been created.
+No subscription has ever been created.
 
-Two things to settle:
+**Item 2 is now closed.** The model contradiction is resolved: **SKUForge uses
+`appSubscriptionCreate` — the standard Billing API — and *not* Shopify-managed pricing.** That is
+what `app/adapters/billing/shopifyBilling.ts` implements, with prices in `PLAN_PRICES`
+(`app/core/constants.ts`). `DEPLOYMENT_HANDOFF.md` §5c, which said the opposite, has been corrected
+in place.
 
-1. **Test the loop:** approve a Pro test charge on the dev store, confirm
-   `app_subscriptions/update` flips `Shop.plan`, confirm gated features unlock, cancel, confirm
-   downgrade to Free. **Then set `BILLING_TEST=false`** in `/etc/vps-apps/skuforge.env` and redeploy.
-2. **Resolve the model contradiction:** the code uses `appSubscriptionCreate` (the standard
-   Billing API), while `DEPLOYMENT_HANDOFF.md` §5c insists on Shopify-managed pricing and says not
-   to add recurring charges. Both are approvable; configuring both conflicts. The code as written
-   expects the non-managed path.
+> **Consequence for the listing:** do **not** configure managed pricing in the Partner Dashboard.
+> Configuring managed pricing *and* creating app subscriptions in code charges the merchant twice.
+> Enter the plan names and prices on the listing for display only.
+
+**Item 1 — the test loop — still needs running:** approve a Pro test charge on the dev store,
+confirm `app_subscriptions/update` flips `Shop.plan`, confirm gated features unlock, cancel,
+confirm downgrade to Free.
+
+⚠️ **Sequencing changed 2026-08-13.** `BILLING_TEST` is now **`false`** in
+`/etc/vps-apps/skuforge.env` — the correct production value, and verified in the running container.
+But development stores only accept **test** charges, so with the flag false the walkthrough above
+will fail with a Shopify error rather than producing a confirmation URL. **Flip it back to `true`
+for the duration of the test, then return it to `false`:**
+
+```bash
+sudo sed -i 's/^BILLING_TEST=.*/BILLING_TEST=true/' /etc/vps-apps/skuforge.env
+cd /opt/vps-apps/project-skuforge && docker compose -p skuforge up -d web
+```
+
+Reverse the `sed` when finished. Do not submit for review with it left `true`.
 
 ### 🟠 BLOCKER-G — Real-store smoke test (needs you)
 
@@ -208,8 +296,10 @@ Ordered by revenue relevance. None blocking.
 
 | # | Task | Time |
 |---|---|---|
+| 0 | **Resolve the `client_id` / `SHOPIFY_API_KEY` mismatch (BLOCKER-0). Do this before anything that runs `shopify app deploy`.** | 5 min |
+| 0b | **Copy `/etc/vps-apps/skuforge-backup.key` off the VPS.** One command, and the backups are worthless without it. | 2 min |
 | 1 | Decide the API version (BLOCKER-B), then run `shopify app deploy` | 10 min |
-| 2 | Set a real `SUPPORT_EMAIL` + `LEGAL_ENTITY` in `app/config/brand.ts`; redeploy | 15 min |
+| 2 | Set a real `SUPPORT_EMAIL` + `LEGAL_ENTITY` + `GOVERNING_LAW` in `app/config/brand.ts`; redeploy | 15 min |
 | 3 | **Create a product on the dev store; confirm the webhook fires** (BLOCKER-G, highest value) | 30 min |
 | 4 | Billing test loop, then `BILLING_TEST=false` (BLOCKER-F) | 1 h |
 | 5 | Rest of the `docs/GO_LIVE.md` §4 smoke test, incl. printing labels | 2–3 h |
@@ -247,8 +337,14 @@ Then update `SKUFORGE_RELEASE` in `/etc/vps-apps/release-refs.env`.
 
 `/etc/cron.d/skuforge-scan` runs `/usr/local/bin/skuforge-cron-scan.sh` daily at 03:17 UTC, logging
 to `/var/log/skuforge-cron.log`. The script reads `SHOPIFY_APP_URL` and `CRON_SECRET` from
-`/etc/vps-apps/skuforge.env` and strips CR — **that env file has CRLF line endings**, and an
-unstripped `\r` corrupts the `Authorization` header (`curl: (43)`).
+`/etc/vps-apps/skuforge.env` and strips CR, because an unstripped `\r` corrupts the `Authorization`
+header (`curl: (43)`).
+
+**Correction 2026-08-13:** earlier passes of this document asserted that env file *has* CRLF line
+endings. It does not — it is LF-clean, and no CR is reaching the container's env values (checked
+with `cat -A` on `SHOPIFY_API_SECRET`, `CRON_SECRET`, and `SCOPES`). The `tr -d '\r'` guard stays
+regardless; the claim was wrong but the defence is cheap and the next hand-edit from a Windows
+machine could make it true.
 
 **Version-controlled as of 2026-08-13.** Both files previously existed only on the VPS, so a rebuilt
 host would have lost the scheduler silently. They now live in `ops/cron/` — byte-identical to what
@@ -259,6 +355,31 @@ class above.
 
 It currently returns `{"results":[]}` because the only installed shop is on the Free plan and
 duplicate scanning is a Pro entitlement. This will start doing real work after the billing test.
+
+### Encrypted database backups
+
+**New 2026-08-13 — there were none before this.** The only copy of production data was the live
+`skuforge-postgres` Docker volume; a volume loss or a bad migration would have been unrecoverable.
+
+`/etc/cron.d/skuforge-backup` runs `/usr/local/bin/skuforge-backup.sh` daily at **03:37 UTC**,
+twenty minutes after the scan so it captures the state the scan left rather than racing it. Output
+is `pg_dump | gzip -9 | openssl enc -aes-256-cbc -pbkdf2 -iter 200000` to
+`/var/backups/skuforge/`, mode `600`, 14-day retention, logging to syslog
+(`journalctl -t skuforge-backup`).
+
+Version-controlled in `ops/backup/` with an idempotent `install.sh`; full restore procedure and
+design notes in **`docs/BACKUPS.md`**. Verified end to end on the first run — decrypted, gunzipped,
+and confirmed to contain all 12 tables with their `COPY` data blocks.
+
+> ⚠️ **The encryption key at `/etc/vps-apps/skuforge-backup.key` currently exists only on the
+> VPS.** A backup encrypted with a key stored on the machine being backed up protects against
+> nothing. Copy it to wherever `SHOPIFY_API_SECRET` is kept. This is the one part of the backup
+> work an agent cannot finish for you.
+
+Two limits worth knowing: the dumps are *logical*, so there is no point-in-time recovery and the
+worst case is losing up to 24 hours; and they are stored **on the same host as the database**, so
+they survive a bad migration or a dropped table but not a loss of the VPS itself. Shipping them
+off-host is the natural next step.
 
 ---
 
@@ -272,6 +393,9 @@ duplicate scanning is a Pro entitlement. This will start doing real work after t
 | Competitor audit returns "changed wedge" | Medium | Repositioning | Run it in parallel now, not after submission. |
 | 2025-10 leaves support before the bump lands | Medium | Forced migration under time pressure | Schedule the fixture re-record immediately post-launch. |
 | Accidental second Compose stack | Medium | ~50% of requests hit an empty DB | §5 — always pass `-p skuforge`. |
+| `shopify app deploy` pushes config to the wrong Partner app | **High until BLOCKER-0 is resolved** | Silent no-op; the live app keeps stale config while the deploy reports success | BLOCKER-0 — confirm which app `skuforge-lab` is installed on before deploying. |
+| Backup encryption key lost with the host | **High while the key is only on the VPS** | Every backup becomes permanently unreadable | Copy `/etc/vps-apps/skuforge-backup.key` off-host. Task 0b. |
+| VPS lost entirely | Low | Backups die with the database — they share a host | Ship the nightly `.enc` files off-host. Post-launch; the encryption is already done, so any dumb transport works. |
 
 ---
 
@@ -281,9 +405,9 @@ duplicate scanning is a Pro entitlement. This will start doing real work after t
 |---|---|
 | "there is **no `docker-compose.yml`** yet" | It exists and is in use (PR #14). |
 | Hostnames are `*.nickbolles.com` | Actual: `skuforge.srv1073822.hstgr.cloud`. `env.production.example` still shows the `nickbolles.com` default. |
-| "SKUForge 175 [tests]" | Now 191. |
-| "All tests pass" | Was true only sequentially, and one file silently contributed zero tests. Both fixed — now genuinely 191/191. |
-| §5c "use Shopify-managed App Pricing" | The code uses `appSubscriptionCreate`. Unresolved — BLOCKER-F. |
+| "SKUForge 175 [tests]" | Now 192. |
+| "All tests pass" | Was true only sequentially, and one file silently contributed zero tests. Both fixed — now genuinely 192/192. |
+| §5c "use Shopify-managed App Pricing" | **Resolved 2026-08-13 — the handoff was wrong for SKUForge.** The code uses `appSubscriptionCreate`, and that is the decided model. §5c has been corrected in place. Do not configure managed pricing in the Dashboard; doing both charges the merchant twice. AlertProof and CheckoutWatch are unaffected — verify their model separately rather than assuming it matches. |
 | Pinned Admin API version `2026-07` | **The handoff was right and the first version of this plan was wrong to flag it.** The Dashboard is on 2026-07; the *code* is on 2025-10. That mismatch is BLOCKER-B. |
 
 One more note: the granted OAuth scope on `skuforge-lab` reads as `write_products` alone rather
