@@ -283,10 +283,31 @@ Ordered by revenue relevance. None blocking.
   drawing each retry from the shared per-rule counter (the approach the barcode path already used) so
   a bumped number can never be one a concurrent job holds. `assignUnique` still backstops with a
   suffix after `SEQUENCE_BUMP_ATTEMPTS`. Covered by a new test in `generation.server.test.ts`.
-- **MINOR-5 — coverage thresholds** never wired, despite Phase 12 requiring core ≥ 90% / services ≥ 75%.
+- ~~**MINOR-5 — coverage thresholds**~~ **Wired 2026-08-13.** `@vitest/coverage-v8` added, per-layer
+  thresholds set in `vitest.config.ts`, and CI now runs `npm run test:coverage` so they actually gate
+  merges. Actuals: **core 96.65%** stmts / 89.96% branch, **services 85.13%** stmts / 73.58% branch.
+  Phase 12's 90%/75% targets are met on statements, lines, and functions. **One gap remains:**
+  services *branch* coverage is 73.58%, short of 75%, so that threshold is pinned at 72 as a
+  ratchet rather than silently dropped. Raise it once the gap closes.
 - **MINOR-7 — full-catalog materialization.** Fine at 10k variants, a memory risk at 50–100k.
-- **MINOR-9 — weak assertions** in two guard tests.
+  Not attempted — it is a streaming refactor of `catalogSnapshot`, and the plan's own risk register
+  says live-Shopify shapes are unverified. Doing it before the smoke test would change the code
+  under test at exactly the wrong moment.
+- ~~**MINOR-9 — weak assertions** in two guard tests.~~ **Fixed 2026-08-13.** Both barcode-overwrite
+  guard tests asserted only a status. `skipped_conflict` is returned for three different reasons and
+  only the message distinguishes them, and neither test checked the barcode was actually withheld —
+  so a guard that blocked for the wrong reason, or blocked *and still wrote*, passed. Both now assert
+  the full result and re-read the variant.
 - **Restore test parallelism** by giving each worker its own SQLite file (currently serial, ~15s).
+  Not attempted — the datasource URL is hardcoded in `prisma/schema.prisma`, so this needs a
+  per-worker env override plus a migration step per worker. ~15s serial is not worth that risk
+  pre-launch.
+- ~~**Dead CI workflows.**~~ **Removed 2026-08-13.** Six workflows inherited from the Shopify app
+  template were inoperative here: `cla.yml` failed on **every** PR (`Input required and not
+  supplied: cla-token`), and the three `gardener-*` plus two issue-label workflows were gated on
+  secrets and labels this repo does not have — `gh secret list` is empty and none of
+  `Waiting for Response` / `devtools-gardener` / `devtools-investigate-for-gardener` exist. Only
+  `ci.yml` remains. Same cleanup as PR #21.
 - **Deploy automation.** Deploys are manual; the release SHA is tracked by hand in
   `/etc/vps-apps/release-refs.env`.
 

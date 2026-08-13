@@ -44,6 +44,10 @@ describe("editor service", () => {
     const catalog = new InMemoryShopifyCatalog([variant]);
     const barcodeWarning = await inlineEditVariant(catalog, { variantId: "v1", field: "barcode", newValue: "999999", expectedValue: "012345" });
     expect(barcodeWarning).toMatchObject({ status: "warning", barcodeOverwrite: true });
+    // The point of the warning is that the write is withheld pending consent.
+    // Asserting only the returned status would pass even if the barcode had
+    // already been overwritten.
+    expect(catalog.snapshot().find((item) => item.variantId === "v1")?.barcode).toBe("012345");
     const conflict = await inlineEditVariant(catalog, { variantId: "v1", field: "sku", newValue: "NEXT", expectedValue: "STALE" });
     expect(conflict.status).toBe("conflict");
     if (conflict.status === "conflict") expect(conflict.message).toContain("Reload this row");
