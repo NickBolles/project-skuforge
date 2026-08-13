@@ -1,0 +1,7 @@
+# Encrypted nightly SKUForge Postgres backup. Logs to syslog (journalctl -t skuforge-backup).
+#
+# 03:37 UTC — twenty minutes after the nightly scan at 03:17 (ops/cron/skuforge-scan.cron),
+# so the backup captures the state the scan left behind rather than racing it.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+37 3 * * * root /usr/local/bin/skuforge-backup.sh 2>&1 | logger -t skuforge-backup
