@@ -560,7 +560,21 @@ describe.each(implementations)(
           expectedBarcode: "200",
         },
       ]);
-      expect(blocked).toMatchObject({ status: "skipped_conflict" });
+      // skipped_conflict is returned for three different reasons — a SKU CAS
+      // miss, a barcode CAS miss, and this guard — and only the message tells
+      // them apart. Assert the whole result so a block for the wrong reason
+      // fails here, and re-read the variant so a "blocked" verdict that still
+      // wrote the barcode cannot pass.
+      expect(blocked).toEqual({
+        variantId: "gid://shopify/ProductVariant/2",
+        status: "skipped_conflict",
+        message:
+          "A non-empty barcode cannot be overwritten without explicit consent.",
+      });
+      const [untouched] = await harness.catalog.getVariants([
+        "gid://shopify/ProductVariant/2",
+      ]);
+      expect(untouched?.barcode).toBe("200");
       const [applied] = await harness.catalog.updateVariants([
         {
           variantId: "gid://shopify/ProductVariant/2",

@@ -1,0 +1,4 @@
+# SKUForge nightly duplicate scan — 03:17 UTC daily.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+17 3 * * * root /usr/local/bin/skuforge-cron-scan.sh >> /var/log/skuforge-cron.log 2>&1

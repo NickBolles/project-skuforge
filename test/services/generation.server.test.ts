@@ -191,6 +191,23 @@ describe("generation jobs", () => {
     expect(catalog.snapshot().filter((item) => item.variantId !== "v3").map((item) => item.sku)).toEqual(["SAME", "SAME-2"]);
   });
 
+  it("advances to the next free sequence number instead of suffixing a taken one", async () => {
+    // ACM-0001 is already taken, so the first target's allocated number collides.
+    // It must land on a fresh four-digit number drawn from the rule counter, not
+    // on the suffixed ACM-0001-2.
+    const catalog = new InMemoryShopifyCatalog([variant("v1", null), variant("v2", null), variant("v3", "ACM-0001")]);
+    const createdRule = await rule();
+    const planned = await createBulkGenerationJob(db, catalog, { shopDomain, ruleSetId: createdRule.id, trigger: "all_missing", idempotencyKey: "seq-bump" });
+    const proposed = planned.items.map((item) => item.proposedSku!);
+    expect(proposed).toHaveLength(2);
+    for (const sku of proposed) expect(sku).toMatch(/^ACM-\d{4}$/);
+    expect(new Set([...proposed, "ACM-0001"]).size).toBe(3);
+
+    const result = await runGenerationJob(db, catalog, planned.id);
+    expect(result.job.status).toBe("completed");
+    expect((await scanCatalog(catalog.streamAllVariants())).summary.duplicateGroups).toBe(0);
+  });
+
   it("rejects a second UI job while the shop lock is held", async () => {
     const catalog = new InMemoryShopifyCatalog([variant("v1", null)]);
     const createdRule = await rule();

@@ -9,6 +9,20 @@ name = "SKUForge"
 application_url = "https://skuforge.srv1073822.hstgr.cloud"
 embedded = true
 
+[build]
+# `shopify app dev` rewrites application_url and redirect_urls to its tunnel URL
+# and pushes them when this is true. Production runs at a fixed host, so leaving
+# it on means a local dev session silently repoints the live app at a tunnel that
+# dies when the session ends. Keep it false and change URLs deliberately.
+automatically_update_urls_on_dev = false
+# Without this, `shopify app deploy` can push extensions only and leave the
+# [access_scopes], [auth], and [webhooks] blocks below unapplied — a silent no-op
+# that looks like a successful deploy.
+include_config_on_deploy = true
+# The dev store the app is installed on (verified against the production Shop and
+# Session tables).
+dev_store_url = "skuforge-lab.myshopify.com"
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 # Shopify implies read_products from write_products, so an installed shop reports

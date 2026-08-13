@@ -1,9 +1,10 @@
 /**
  * Public-facing identity for the marketing, privacy, and support pages.
  *
- * ⚠️ SUPPORT_EMAIL and LEGAL_ENTITY must be real before App Store submission —
- * Shopify requires a working support contact, and the privacy policy needs a
- * named controller. Change them here only; nothing else hardcodes them.
+ * ⚠️ SUPPORT_EMAIL, LEGAL_ENTITY, and GOVERNING_LAW must be real before App
+ * Store submission — Shopify requires a working support contact, the privacy
+ * policy needs a named controller, and the terms name a jurisdiction. Change
+ * them here only; nothing else hardcodes them.
  */
 export const APP_NAME = "SKUForge";
 
@@ -14,6 +15,17 @@ export const LEGAL_ENTITY = "SKUForge";
 
 /** Last substantive revision of the privacy policy, shown on the page. */
 export const PRIVACY_LAST_UPDATED = "2026-08-12";
+
+/** Last substantive revision of the terms of service, shown on the page. */
+export const TERMS_LAST_UPDATED = "2026-08-13";
+
+/**
+ * Jurisdiction named in the terms of service.
+ *
+ * ⚠️ Placeholder — set this to the state/country {@link LEGAL_ENTITY} is
+ * actually organized in before App Store submission.
+ */
+export const GOVERNING_LAW = "the State of Delaware, United States";
 
 /** Target response time quoted on the support page. */
 export const SUPPORT_RESPONSE_TIME = "one business day";

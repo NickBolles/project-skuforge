@@ -33,8 +33,11 @@ jobs:
       - name: Apply SQLite migrations
         run: npx prisma migrate deploy
 
-      - name: Run tests
-        run: npm run test
+      # Runs the same suite as `npm run test`, plus the per-layer coverage
+      # thresholds in vitest.config.ts. Phase 12 set those targets but nothing
+      # enforced them until now.
+      - name: Run tests with coverage thresholds
+        run: npm run test:coverage
 
       - name: Build application
         run: npm run build

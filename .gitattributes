@@ -1,0 +1,11 @@
+# Normalize text files, and let git decide what is text.
+* text=auto
+
+# Files that are executed on Linux must keep LF regardless of the checkout
+# platform. A CRLF shebang line makes the kernel look for an interpreter named
+# "bash\r", and a CRLF crontab is silently ignored. This repo has already hit the
+# CRLF class of bug once — see the tr -d '\r' note in docs/CRON.md.
+*.sh        text eol=lf
+*.cron      text eol=lf
+*.logrotate text eol=lf
+Dockerfile  text eol=lf
