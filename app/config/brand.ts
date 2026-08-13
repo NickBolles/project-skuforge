@@ -1,9 +1,10 @@
 /**
  * Public-facing identity for the marketing, privacy, and support pages.
  *
- * ⚠️ SUPPORT_EMAIL and LEGAL_ENTITY must be real before App Store submission —
- * Shopify requires a working support contact, and the privacy policy needs a
- * named controller. Change them here only; nothing else hardcodes them.
+ * ⚠️ SUPPORT_EMAIL, LEGAL_ENTITY, and GOVERNING_LAW must be real before App
+ * Store submission — Shopify requires a working support contact, the privacy
+ * policy needs a named controller, and the terms name a jurisdiction. Change
+ * them here only; nothing else hardcodes them.
  */
 export const APP_NAME = "SKUForge";
 
