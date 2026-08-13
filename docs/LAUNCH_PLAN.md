@@ -1,8 +1,12 @@
 # SKUForge — Launch Plan
 
-**Last updated:** 2026-08-12 (second pass, after execution)
-**Audited against:** `main` @ `a5dc4c7`, live VPS deployment, live production database,
+**Last updated:** 2026-08-13 (third pass, after execution)
+**Audited against:** `main` @ `0f974e0`, live VPS deployment, live production database,
 and the Partner Dashboard config pulled via `shopify app config link`.
+
+**Third pass summary:** added the missing `[build]` block to `shopify.app.toml` (BLOCKER-A now does
+what it says), version-controlled the VPS cron under `ops/cron/`, fixed MINOR-3, and re-audited
+MINOR-2 as stale. The five human blockers below (B–H) are unchanged and still gate submission.
 **Target:** Shopify App Store listing.
 
 `docs/GO_LIVE.md` remains authoritative for env-var names and webhook paths.
@@ -64,7 +68,7 @@ gap in testing, not evidence of breakage.
 
 ### 🔴 BLOCKER-A — `shopify app deploy` (needs you)
 
-**Time:** 5 min. **Blocked on:** my sandbox denied the command; you need to run it.
+**Time:** 5 min. **Blocked on:** it pushes the BLOCKER-B version decision, which is yours to make.
 
 The reconciled config is committed but not pushed to Shopify. Run from the repo root:
 
@@ -72,10 +76,24 @@ The reconciled config is committed but not pushed to Shopify. Run from the repo 
 shopify app deploy
 ```
 
-You are already authenticated (I linked the config in this session), so this should not re-prompt.
+You are already authenticated as `me@nickbolles.com`, so this should not re-prompt.
+`shopify app config validate --json` reports `{"valid": true, "issues": []}`.
 
 **What it changes:** pushes the webhook API version pin (see BLOCKER-B). Everything else in the
 config already matches the Dashboard, so this is otherwise a no-op.
+
+**Added 2026-08-13 — the `[build]` block the config was missing.** `shopify.app.toml` had no
+`[build]` section at all, which mattered in two ways:
+
+- `include_config_on_deploy` was unset. Without it, `shopify app deploy` can push extensions only
+  and leave `[access_scopes]`, `[auth]`, and `[webhooks]` unapplied — a silent no-op that looks like
+  a successful deploy. It is now explicitly `true`, so the command above does what this doc claims.
+- `automatically_update_urls_on_dev` was unset. Left on, a local `shopify app dev` session rewrites
+  `application_url`/`redirect_urls` to its tunnel and pushes them, repointing the live app at a
+  tunnel that dies with the session. Now explicitly `false`.
+
+`dev_store_url` is also set to `skuforge-lab.myshopify.com`, verified against the production `Shop`
+and `Session` tables.
 
 ### 🔴 BLOCKER-B — Decide the webhook API version (needs your call)
 
@@ -167,11 +185,16 @@ Ordered by revenue relevance. None blocking.
   item here.
 - **API version bump to 2026-07** (if you take the 2025-10 pin) — requires re-recording adapter
   fixtures and re-running the contract suite. Deadline ~October 2026.
-- **MINOR-2 — fix-flow trust polish.** One-click Fix skips the planned inline preview and marks
-  findings `fixed` unconditionally, even when the run ended `completed_with_skips`. This is on the
-  demo path that sells the install.
-- **MINOR-3 — sequence-bump collisions.** The strategy exists in `app/core/validate/assign.ts` but
-  no caller passes it, so collisions always suffix (`ABC-0005-2`) where `ABC-0006` was free.
+- ~~**MINOR-2 — fix-flow trust polish.**~~ **Stale — re-audited 2026-08-13 and largely untrue.**
+  `fixFinding` (`app/services/scan.server.ts`) only marks a finding `fixed` when
+  `items.every(status === "applied")`, so a `completed_with_skips` run leaves it `open`. And
+  `previewFindingFix` is exported *and* wired to its own action in `app/routes/app.scan.tsx`, so the
+  inline preview is not skipped. Nothing to fix here; the entry described code that no longer exists.
+- ~~**MINOR-3 — sequence-bump collisions.**~~ **Fixed 2026-08-13.** `createBulkGenerationJob` now
+  advances to the next free sequence number on a collision when the pattern carries a `{seq}` token,
+  drawing each retry from the shared per-rule counter (the approach the barcode path already used) so
+  a bumped number can never be one a concurrent job holds. `assignUnique` still backstops with a
+  suffix after `SEQUENCE_BUMP_ATTEMPTS`. Covered by a new test in `generation.server.test.ts`.
 - **MINOR-5 — coverage thresholds** never wired, despite Phase 12 requiring core ≥ 90% / services ≥ 75%.
 - **MINOR-7 — full-catalog materialization.** Fine at 10k variants, a memory risk at 50–100k.
 - **MINOR-9 — weak assertions** in two guard tests.
@@ -226,6 +249,13 @@ Then update `SKUFORGE_RELEASE` in `/etc/vps-apps/release-refs.env`.
 to `/var/log/skuforge-cron.log`. The script reads `SHOPIFY_APP_URL` and `CRON_SECRET` from
 `/etc/vps-apps/skuforge.env` and strips CR — **that env file has CRLF line endings**, and an
 unstripped `\r` corrupts the `Authorization` header (`curl: (43)`).
+
+**Version-controlled as of 2026-08-13.** Both files previously existed only on the VPS, so a rebuilt
+host would have lost the scheduler silently. They now live in `ops/cron/` — byte-identical to what
+is running — alongside an idempotent `ops/cron/install.sh` and a logrotate config. See
+`docs/CRON.md`. Re-run `sudo bash ops/cron/install.sh` after any deploy that touches `ops/cron/`.
+A `.gitattributes` pins `*.sh`/`*.cron` to LF so a Windows checkout cannot reintroduce the CRLF bug
+class above.
 
 It currently returns `{"results":[]}` because the only installed shop is on the Free plan and
 duplicate scanning is a Pro entitlement. This will start doing real work after the billing test.

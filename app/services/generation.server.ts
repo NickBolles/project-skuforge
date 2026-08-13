@@ -128,6 +128,12 @@ function hasSequence(ast: PatternAst): boolean {
   return ast.nodes.some((node) => node.type === "token" && node.kind === "seq");
 }
 
+// Bound on how far a sequenced SKU will advance past a collision before falling
+// back to a suffix. Each attempt burns one number from the rule's counter, so an
+// unbounded loop over a pathologically dense namespace would inflate the counter
+// without end.
+const SEQUENCE_BUMP_ATTEMPTS = 50;
+
 async function createJobRecord(
   db: PrismaClient,
   data: { shopId: string; ruleSetId: string; trigger: GenerationTrigger; idempotencyKey: string; fields: ("sku" | "barcode")[] },
@@ -189,17 +195,34 @@ export async function createBulkGenerationJob(
     const index = new DupIndex();
     index.addBatch(all.map((variant) => ({ variantId: variant.variantId, sku: variant.sku })));
     const start = await allocateStart(db, shop.id, rule.id, targets.length, parsed.ast);
-    const items = targets.map((variant, offset) => {
-      const proposed = render(parsed.ast, contextFor(variant), start + offset, config);
+    const patternHasSequence = hasSequence(parsed.ast);
+    const items = [];
+    for (const [offset, variant] of targets.entries()) {
+      const context = contextFor(variant);
+      let proposed = render(parsed.ast, context, start + offset, config);
+      // When the pattern carries a sequence token, a taken number is better
+      // resolved by advancing to the next free one (ABC-0006) than by suffixing
+      // the taken one (ABC-0005-2). Each retry draws from the shared per-rule
+      // counter — the same approach the barcode path uses below — so a bumped
+      // number can never be one a concurrent job already holds. assignUnique
+      // still backstops with a suffix if the retries are exhausted.
+      for (
+        let attempt = 0;
+        patternHasSequence && attempt < SEQUENCE_BUMP_ATTEMPTS && index.has(proposed, variant.variantId);
+        attempt += 1
+      ) {
+        const extra = await allocateSequenceBlock(db, shop.id, `rule:${rule.id}`, 1);
+        proposed = render(parsed.ast, context, extra.start, config);
+      }
       const assignment = assignUnique(proposed, index, { ownerId: variant.variantId });
-      return {
+      items.push({
         jobId: record.job.id,
         variantId: variant.variantId,
         productId: variant.productId,
         proposedSku: assignment.sku,
         expectedSku: variant.sku,
-      };
-    });
+      });
+    }
     if (items.length) await db.generationJobItem.createMany({ data: items });
     const totals: GenerationTotals = { planned: items.length, applied: 0, skippedConflict: 0, errored: 0 };
     await db.generationJob.update({ where: { id: record.job.id }, data: { status: "previewing", totals: JSON.stringify(totals) } });
