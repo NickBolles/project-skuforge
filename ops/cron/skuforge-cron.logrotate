@@ -1,0 +1,12 @@
+# Installed to /etc/logrotate.d/skuforge-cron.
+# One ~65-byte line per night, so this is hygiene rather than a space concern —
+# it keeps a year of scan history bounded and readable.
+/var/log/skuforge-cron.log {
+    monthly
+    rotate 12
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root root
+}
