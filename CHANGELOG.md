@@ -1,7 +1,7 @@
 # @shopify/shopify-app-template-react-router
 
 ## 2026.08.13
-- [#23](https://github.com/NickBolles/project-skuforge/pull/23) Add a public `/terms` page linked from every marketing page; add encrypted nightly Postgres backups under `ops/backup/` with restore docs in `docs/BACKUPS.md`; settle the billing model on `appSubscriptionCreate` and correct `DEPLOYMENT_HANDOFF.md` §5c; add the missing `[build]` block to `shopify.app.toml`; version-control the VPS scan cron under `ops/cron/`; advance the sequence number on SKU collisions instead of appending a suffix.
+- [#23](https://github.com/NickBolles/project-skuforge/pull/23) Add a public `/terms` page linked from every marketing page; add encrypted nightly Postgres backups under `ops/backup/` with restore docs in `docs/BACKUPS.md`; settle the billing model on `appSubscriptionCreate` and correct `DEPLOYMENT_HANDOFF.md` §5c; add the missing `[build]` block to `shopify.app.toml`; version-control the VPS scan cron under `ops/cron/`; advance the sequence number on SKU collisions instead of appending a suffix; enforce per-layer test coverage thresholds in CI via `@vitest/coverage-v8`; strengthen the two barcode-overwrite guard tests to assert the write was actually withheld; remove six inoperative GitHub Actions workflows inherited from the upstream template, including the CLA check that failed on every pull request.
 
 ## 2026.07.25
 - [#16](https://github.com/NickBolles/project-skuforge/pull/16) Rebuild the main page as a guided dashboard: catalog health hero, recommended-next-step banner, setup checklist, stat tiles, and plan-badged quick actions; add the user story and UX spec in `docs/UX_MAIN_PAGE.md`.
