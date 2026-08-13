@@ -15,6 +15,17 @@ export const LEGAL_ENTITY = "SKUForge";
 /** Last substantive revision of the privacy policy, shown on the page. */
 export const PRIVACY_LAST_UPDATED = "2026-08-12";
 
+/** Last substantive revision of the terms of service, shown on the page. */
+export const TERMS_LAST_UPDATED = "2026-08-13";
+
+/**
+ * Jurisdiction named in the terms of service.
+ *
+ * ⚠️ Placeholder — set this to the state/country {@link LEGAL_ENTITY} is
+ * actually organized in before App Store submission.
+ */
+export const GOVERNING_LAW = "the State of Delaware, United States";
+
 /** Target response time quoted on the support page. */
 export const SUPPORT_RESPONSE_TIME = "one business day";
 

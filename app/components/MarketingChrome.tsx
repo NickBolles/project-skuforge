@@ -16,6 +16,7 @@ export function MarketingChrome({ children }: { children: ReactNode }) {
         <nav className={styles.nav}>
           <a href="/support">Support</a>
           <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
         </nav>
       </header>
       {children}
@@ -24,6 +25,7 @@ export function MarketingChrome({ children }: { children: ReactNode }) {
           © {new Date().getFullYear()} {APP_NAME}
         </span>
         <a href="/privacy">Privacy policy</a>
+        <a href="/terms">Terms of service</a>
         <a href="/support">Support</a>
         <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
       </footer>
